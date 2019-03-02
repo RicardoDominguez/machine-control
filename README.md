@@ -6,7 +6,7 @@ Software is divided into two sections:
  * Machine side - performs build and processes raw data
  * Cluster side - computes actions according to state of system
 
-Communications is done through SFTP by passing files.
+Communications is done through SFTP by passing files. The machine side establishes communication with the server, and takes care of setting and getting files.
  * The action array has a size of `N x 2`, where N is the number of parts being built.
  * The state array has a size of `N x 16`.
 
@@ -21,7 +21,7 @@ Methods:
 Program flow:
  * `states` <- `getStates()`
  * `actions` <- `computeAction(states)`
- * `sendAction(states)`
+ * `sendAction(action)`
 
 # Machine side
  * `getActions()` - read actions communicated by the cluster side
