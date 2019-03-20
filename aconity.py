@@ -6,6 +6,7 @@ import os
 import numpy as np
 from dotmap import DotMap
 import pysftp
+import re
 
 import asyncio
 import signal
@@ -16,7 +17,7 @@ from AconitySTUDIO_client import utils
 
 from process.mainFile import *
 
-def pieceNumber(self, piece_indx):
+def pieceNumber(piece_indx):
     """ 0->4, 1->7, 2->10, etc... """
     return int((piece_indx+1)*3+1)
 
@@ -24,6 +25,7 @@ def getLoginData():
     login_data = { 'rest_url' : f'http://localhost:9000',
                     'ws_url' : f'ws://localhost:9000',
                     'email' : 'admin@aconity3d.com', 'password' : 'passwd'}
+    return login_data
 
 def getUnheatedMonitoringExecutionScript():
     execution_script = \
@@ -38,22 +40,15 @@ def getUnheatedMonitoringExecutionScript():
     repeat(layer)'''
     return execution_script
 
-def makeDirIfDoesNotExist(new_dir):
-    if not os.path.exists(new_dir):
-        os.makedirs(new_dir)
-
 class Aconity:
     def __init__(self, shared_cfg, machine_cfg):
         self.s_cfg = shared_cfg
         self.m_cfg = machine_cfg
 
-        self._initAconity()
-
         # Aconity variables
         self.job_started = False
-        self.processing_uninitialised = True
         self.curr_layer = machine_cfg.aconity.layers[0]
-        self.rectangle_limits_computed = False
+        self.job_paused = False
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -64,6 +59,7 @@ class Aconity:
         rdy = dir + cfg.rdy_name
 
         # Wait until RDY signal is provided
+        print("Waiting for actions...")
         while(not os.path.isdir(rdy)): await asyncio.sleep(0.05)
         os.rmdir(rdy) # Delete RDY
 
@@ -72,7 +68,7 @@ class Aconity:
         print('Control signal received')
         return actions
 
-    def sendStates(self, states):
+    def sendStates(self):
         """Send state information to cluster side"""
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
@@ -82,13 +78,14 @@ class Aconity:
     # ACONITY FUNCTIONS
     # --------------------------------------------------------------------------
 
-    async def _initAconity(self):
-        cfg = self.machine_cfg.aconity
+    async def initAconity(self):
+        cfg = self.m_cfg.aconity
         self.client = await AconitySTUDIOPythonClient.create(getLoginData())
         await self.client.get_job_id(cfg.info.job_name)
         await self.client.get_machine_id('AconityMini')
         await self.client.get_config_id(cfg.info.config_name)
         await self.client.get_session_id(n=-1)
+        print("Done init")
 
     async def _changeMarkSpeed(self, part, value):
         await self.client.change_part_parameter(pieceNumber(part), 'mark_speed', value)
@@ -98,14 +95,17 @@ class Aconity:
 
     async def _pauseUponLayerCompletion(self, sleep_time=0.05):
         """ sleep time in seconds """
+        print("Awaiting for layer completion...")
         original = self.client.job_info['AddLayerCommands']
         while(original==self.client.job_info['AddLayerCommands']):
             await asyncio.sleep(sleep_time)
-        await client.pause_job()
+        print("Job being paused...")
+        await self.client.pause_job()
+        self.job_paused = True
 
     async def performLayer(self, actions):
         """Start building next layer with the specified parameters"""
-        cfg = self.machine_cfg.aconity
+        cfg = self.m_cfg.aconity
         assert cfg.n_parts == actions.shape[0], \
             "Mismatch %d != %d" % (cfg.n_parts, actions.shape[0])
 
@@ -116,7 +116,10 @@ class Aconity:
 
         # Resume / start job
         if self.job_started:
+            print("Wait for job to be paused")
+            while(not self.job_paused): pass
             await self.client.resume_job(layers=cfg.layers)
+            self.job_paused = False
         else:
             execution_script = getUnheatedMonitoringExecutionScript()
             await self.client.start_job(cfg.layers, execution_script)
@@ -127,7 +130,7 @@ class Aconity:
         self.curr_layer += 1
 
     async def loop(self):
-        max_layer = self.machine_cfg.aconity.layers[1]
+        max_layer = self.m_cfg.aconity.layers[1]
         while self.curr_layer <= max_layer:
             print("Layer %d/%d" % (self.curr_layer, max_layer))
             actions = await self.getActions()

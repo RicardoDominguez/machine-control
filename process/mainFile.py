@@ -241,15 +241,31 @@ def divide4squares(data):
 
     return square_limits
 
+def divideSingleSquare(data):
+    """ Divides the input data into a single square with known dimension.
+
+    Inputs: data - shape (N, 3)
+
+    Outputs: square_limits - shape(4,) as [xmin, xmax, ymin, ymax]
+    """
+    # Remove first and last X% of data
+    leave_out = 0.15
+    nout = int(data.shape[0]*leave_out)
+    xmin = data[nout:-nout, 0].min()
+    xmax = data[nout:-nout, 0].max()
+    ymin = data[nout:-nout, 1].min()
+    ymax = data[nout:-nout, 1].max()
+    return np.array([xmin, xmax, ymin, ymax])
+
 def divideDataRectangleLimits(data, square_limits, returnMode=1,  plot=False,
         saveName=None, saveDir=None):
     """ Returns a list with the data for each of the pieces
 
     data : nparray (N, 3)
-    square_limits: nparray (nS, 4) [min X, max X, min Y, max Y]
+    square_limits: nparray (4,) [min X, max X, min Y, max Y]
     plot: bool
     -------
-    return: list of length nS, where list[i] contains all data for piece "i"
+    return: nparray (M, 3)
 
     Output mode:
         0 - no return
@@ -261,6 +277,7 @@ def divideDataRectangleLimits(data, square_limits, returnMode=1,  plot=False,
     # print('Dividing data according to min/max...')
     data_pieces = [] # List of nparrays with data for each piece
     data_trim = data[:, :]
+    square_limits = square_limits.reshape(1,-1)
     n_pieces = square_limits.shape[0]
 
     valid = True
@@ -310,13 +327,13 @@ def divideDataRectangleLimits(data, square_limits, returnMode=1,  plot=False,
         else: plt.show()
 
     if returnMode == 1:
-        return data_pieces
+        return data_pieces[0]
     if returnMode == 2:
-        return data_pieces, data_trim
+        return data_pieces[0], data_trim
     if returnMode == 3:
-        return data_pieces, delete_ratio
+        return data_pieces[0], delete_ratio
     if returnMode == 4:
-        return data_pieces, delete_ratio, not valid
+        return data_pieces[0], delete_ratio, not valid
 
 def pieceStateMeans(piece_data, piece_limits=None, n_splits=None):
     """

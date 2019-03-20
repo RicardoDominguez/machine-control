@@ -6,7 +6,13 @@ import os
 import numpy as np
 from dotmap import DotMap
 import pysftp
+import re
 
+from process.mainFile import *
+
+def pieceNumber(piece_indx):
+    """ 0->4, 1->7, 2->10, etc... """
+    return int((piece_indx+1)*3+1)
 
 class Machine:
     def __init__(self, shared_cfg, machine_cfg):
@@ -15,9 +21,10 @@ class Machine:
 
         self._initSFTP()
 
+        # Aconity variables
         self.processing_uninitialised = True
-        self.rectangle_limits_computed = False
         self.curr_layer = machine_cfg.aconity.layers[0]
+        self.rectangle_limits_computed = np.zeros((self.m_cfg.aconity.n_parts,), dtype=bool)
         self.square_limits = []
 
     # --------------------------------------------------------------------------
@@ -51,6 +58,10 @@ class Machine:
         while(not self.sftp.isdir(rdy)): pass
         self.sftp.rmdir(rdy) # Delete RDY
 
+        # Copy file
+        print('Copying file...')
+        self.sftp.get(dir+cfg.f_name, localpath=dir+cfg.f_name)
+
         # Copy file and signal acconity
         print('Copying file...')
         self.sftp.get(dir+cfg.f_name, localpath=dir+cfg.f_name)
@@ -75,9 +86,19 @@ class Machine:
     # --------------------------------------------------------------------------
     # PROCESS FUNCTIONS
     # --------------------------------------------------------------------------
-
     def initProcessing(self):
         cfg = self.m_cfg.aconity.process
+        def getLatestSession(folder_name):
+            best, name = None, None
+            for filename in os.listdir(folder_name):
+                match = re.search(r'session_(\d+)_(\d+)_(\d+)_(\d+)-(\d+)-(\d+).(\d+)', filename)
+                if match:
+                    date = [int(match.group(i+1)) for i in range(7)]
+                    for i in range(7):
+                        if best is None or date[i] > best[i]:
+                            best, name = date, filename
+                            break
+            return name
         def getLatestConfigJobFolder(folder_name, init_str):
             latest_n, name = -1, None
             for filename in os.listdir(folder_name):
@@ -86,9 +107,10 @@ class Machine:
                         latest_n, name = int(match.group(1)), filename
             if name is None: raise ValueError('No suitable '+init_str+' folders found')
             return name
-        config_folder = getLatestConfigJobFolder(cfg.sess_dir, 'config')
-        job_folder = getLatestConfigJobFolder(cfg.sess_dir+config_folder+'/', 'job')
-        self.data_folder = cfg.sess_dir+config_folder+'/'+job_folder+'/sensors/2Pyrometer/pyrometer2/'
+        sess_folder = cfg.sess_dir+getLatestSession(cfg.sess_dir)+'/'
+        config_folder = sess_folder+getLatestConfigJobFolder(sess_folder, 'config')+'/'
+        job_folder = config_folder+getLatestConfigJobFolder(config_folder, 'job')+'/'
+        self.data_folder = job_folder+'sensors/2Pyrometer/pyrometer2/'
         self.processing_uninitialised = False
         print("Data folder found is " + self.data_folder)
 
@@ -97,7 +119,7 @@ class Machine:
 
     def getStates(self):
         """Read raw data from the pyrometer and processes it into states"""
-        if processing_uninitialised:
+        if self.processing_uninitialised:
             rdy = self.s_cfg.comms.dir + self.s_cfg.comms.state.rdy_name
             while(not os.path.isdir(rdy)): pass
             os.rmdir(rdy)
@@ -105,29 +127,34 @@ class Machine:
 
         cfg = self.m_cfg.aconity
         nS = self.s_cfg.env.nS
-        n_div = int(sqrt(nS))
+        n_div = int(np.sqrt(nS))
         layer = self.curr_layer
         states = np.zeros((cfg.n_parts, nS))
         for part in range(cfg.n_parts):
             filename = self.getFileName(layer, part)
             print("Expected file "+filename)
-            while(not os.path.isfile(filename)): pass
+            while(not os.path.isfile(filename)): time.sleep(0.05)
             time.sleep(cfg.process.sleep_t) # Prevent reading too soon
 
             # Read and process data
             data = loadData(filename)
-            if not self.rectangle_limits_computed:
-                self.square_limits.append(divide4squares(data))
+            if not self.rectangle_limits_computed[part]:
+                self.square_limits.append(divideSingleSquare(data))
                 print("Square limits found", self.square_limits[-1])
-
+                self.rectangle_limits_computed[part] = True
             data, cutoff = removeColdLines(data, returnMode=2)
             print("Cut-off value is %d" % (cutoff))
-            data_divisions, ratio, error = divideDataRectangleLimits(data,
-                    square_limits[part], returnMode=4)
+            data, ratio, error = divideDataRectangleLimits(data,
+                    self.square_limits[part], returnMode=4, plot=True, saveName=filename)
             print("Delete ratio %.4f, error %d" % (ratio, error))
-            for sample in range(4):
-                states[part, :] = pieceStateMeans(data_divisions[sample],
-                                                  square_limits[part, sample],
-                                                  n_div)
+            states[part, :] = pieceStateMeans(data, self.square_limits[part], n_div)
         self.curr_layer += 1
         return states
+
+    def sendAction(self, action):
+        dir = self.s_cfg.comms.dir
+        cfg = self.s_cfg.comms.action
+        rdy = dir + cfg.rdy_name
+        np.save(dir+cfg.f_name, action)
+        os.mkdir(rdy) # RDY signal
+        print('Actions saved')

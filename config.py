@@ -53,8 +53,8 @@ def returnMachineCfg():
     cfg.comms.sftp.pwd = 'aw%qzv'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring'
     cfg.aconity.info.job_name = 'SpeedTest'
-    cfg.aconity.layers = [1 166]
+    cfg.aconity.layers = [1, 166]
     cfg.aconity.n_parts = 3
-    cfg.aconity.process.sess_dir = ''
+    cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
     cfg.aconity.process.sleep_t = 2
     return cfg
