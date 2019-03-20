@@ -38,6 +38,34 @@ Program flow:
 
 # AconitySTUDIO Python Client
 
+## File save structure
+```
+log
+  |-session_2019_03_08_16_2etc - date
+    |-config_1_etc -
+      |-job_N_id
+        |-sensors
+          |-2Pyrometer
+            |-pyrometer2
+              |-1 - this one often is missing files, do not use
+              |-4
+                |- 0.03.pcd
+                |- 0.06.pcd
+                |- 0.09.pcd
+                |-...
+              |-7
+              |-...
+```
+
+* `session` file is created upon starting the aconity studi `.bat`
+* `config` file is created upon staring 'Unheated 3D Monitoring'
+* `job` file is created upon clicking 'start script execution'
+
+ 1. Provide `session_2019_03_08_16_2etc`
+ 2. Pick latest config
+ 3. Pick latest job
+ 4. Start listening for changes in 4,7,10 starting with 0.03 and onwards
+
 ## Create the client
 
 ```

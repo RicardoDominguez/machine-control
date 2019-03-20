@@ -83,8 +83,8 @@ if __name__ == '__main__':
 
     #change login_data to your needs
     login_data = {
-        'rest_url' : f'http://143.167.193.57:9000',
-        'ws_url' : f'ws://143.167.193.57:9000',
+        'rest_url' : f'http://localhost:9000',
+        'ws_url' : f'ws://localhost:9000',
         'email' : 'admin@aconity3d.com',
         'password' : 'passwd'
     }
