@@ -6,8 +6,15 @@ import os
 import numpy as np
 
 class Cluster:
-    def __init__(self, shared_cfg):
+    def __init__(self, shared_cfg, contol_cfg):
         self.s_cfg = shared_cfg
+        self.c_cfg = control_cfg
+
+        self.state_traj = []
+        self.action_traj = []
+        self.n_pieces = 8
+        self.a_l = np.array([0.57, 75])
+        self.a_u = np.array([1.8, 140])
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -41,7 +48,10 @@ class Cluster:
 
     def computeAction(self, states):
         """Return control action given the current machine state"""
-        return states
+        self.state_traj.append(states)
+        action = np.random.rand(self.n_pieces, 2)*(self.a_u-self.a_l)+self.a_l
+        print("Action selected", action)
+        return action
 
     def loop(self):
         while(True):
