@@ -4,7 +4,6 @@ import tensorflow as tf
 from dmbrl.modeling.models import BNN
 from dmbrl.modeling.layers import FC
 from dmbrl.misc.DotmapUtils import get_required_argument
-from custom_env.machine_model import MachineModelEnv
 
 # Controller parameters
 # ------------------------------------------------------------------------------

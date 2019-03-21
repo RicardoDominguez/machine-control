@@ -111,8 +111,9 @@ class Aconity:
 
         # Change parameters
         for part in range(cfg.n_parts):
-            await self._changeMarkSpeed(part, actions[part, 0])
-            #await self._changeLaserPower(part, actions[part, 1])
+            print("Part", part, "Setting parameters...", actions[part, :])
+            await self._changeMarkSpeed(part, actions[part, 0]*1000)
+            await self._changeLaserPower(part, actions[part, 1])
 
         # Resume / start job
         if self.job_started:
@@ -123,6 +124,9 @@ class Aconity:
         else:
             execution_script = getUnheatedMonitoringExecutionScript()
             await self.client.start_job(cfg.layers, execution_script)
+            # First very slow, in case job pausing is delayed a bit
+            await self.client.change_part_parameter(1, 'mark_speed', 400)
+            print("Job started...")
             self.job_started = True
             self.sendStates()
 

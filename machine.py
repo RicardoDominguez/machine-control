@@ -8,7 +8,7 @@ from dotmap import DotMap
 import pysftp
 import re
 
-from process.mainFile import *
+from process.process_main import *
 
 def pieceNumber(piece_indx):
     """ 0->4, 1->7, 2->10, etc... """
@@ -50,37 +50,36 @@ class Machine:
     def getActions(self):
         """Read action file outputted by cluster"""
         print('Waiting for actions...')
-        dir = self.s_cfg.comms.dir
+        dir_c = 'machine-control/' + self.s_cfg.comms.dir
+        dir_m = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.action
-        rdy = dir + cfg.rdy_name
+        rdy_c = dir_c + cfg.rdy_name
+        rdy_m = dir_m + cfg.rdy_name
 
         # Wait until RDY signal is provided
-        while(not self.sftp.isdir(rdy)): pass
-        self.sftp.rmdir(rdy) # Delete RDY
-
-        # Copy file
-        print('Copying file...')
-        self.sftp.get(dir+cfg.f_name, localpath=dir+cfg.f_name)
+        while(not self.sftp.isdir(rdy_c)): pass
+        self.sftp.rmdir(rdy_c) # Delete RDY
 
         # Copy file and signal acconity
         print('Copying file...')
-        self.sftp.get(dir+cfg.f_name, localpath=dir+cfg.f_name)
-        os.mkdir(rdy) # RDY signal
+        self.sftp.get(dir_c+cfg.f_name, localpath=dir_m+cfg.f_name)
+        os.mkdir(rdy_m) # RDY signal
         print('Actions saved')
 
     def sendStates(self, states):
         """Send state information to cluster side"""
-        dir = self.s_cfg.comms.dir
+        dir_c = 'machine-control/' + self.s_cfg.comms.dir
+        dir_m = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
 
         # Write states into npy file
         print('Saving states...')
-        np.save(dir+cfg.f_name, states)
+        np.save(dir_m+cfg.f_name, states)
 
         # Upload to server
         print('Uploading states...')
-        self.sftp.put(dir+cfg.f_name, remotepath=dir+cfg.f_name)
-        self.sftp.mkdir(dir+cfg.rdy_name) # RDY signal
+        self.sftp.put(dir_m+cfg.f_name, remotepath=dir_c+cfg.f_name)
+        self.sftp.mkdir(dir_c+cfg.rdy_name) # RDY signal
         print('States sent')
 
     # --------------------------------------------------------------------------
@@ -122,6 +121,7 @@ class Machine:
         if self.processing_uninitialised:
             rdy = self.s_cfg.comms.dir + self.s_cfg.comms.state.rdy_name
             while(not os.path.isdir(rdy)): pass
+            time.sleep(5) # TO MAKE SURE I READ THE CORRECT JOB
             os.rmdir(rdy)
             self.initProcessing()
 
@@ -148,6 +148,7 @@ class Machine:
                     self.square_limits[part], returnMode=4, plot=True, saveName=filename)
             print("Delete ratio %.4f, error %d" % (ratio, error))
             states[part, :] = pieceStateMeans(data, self.square_limits[part], n_div)
+            plotTemperaturesState(states[part, :], saveFig=filename+'_temp.png')
         self.curr_layer += 1
         return states
 
@@ -158,3 +159,9 @@ class Machine:
         np.save(dir+cfg.f_name, action)
         os.mkdir(rdy) # RDY signal
         print('Actions saved')
+
+    def loop(self):
+        while(True):
+            self.getActions()
+            states = self.getStates()
+            self.sendStates(states)

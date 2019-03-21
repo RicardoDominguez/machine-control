@@ -453,7 +453,7 @@ def divideDataXY(states, error):
     return X.reshape(-1, nS), Y.reshape(-1, nS)
 
 
-def plotTemperaturesState(states, vlimits=None, ax=None, saveFig=None, fig=None):
+def plotTemperaturesState(states, vlimits=None, ax=None, saveFig=None, fig=None, title=None):
     """
     Plot the states in a 2D temperature graph
 
@@ -488,9 +488,11 @@ def plotTemperaturesState(states, vlimits=None, ax=None, saveFig=None, fig=None)
         fig, ax = plt.subplots()
         p = ax.pcolor(X_splits, Y_splits, states, cmap=plt.cm.jet, vmin=vmin, vmax=vmax)
         cb = fig.colorbar(p)
+        if title is not None: fig.title(title)
     else:
         p = ax.pcolor(X_splits, Y_splits, states, cmap=plt.cm.jet, vmin=vmin, vmax=vmax)
         if fig is not None: cb = fig.colorbar(p)
+        if title is not None: plt.title(title)
 
     if saveFig is not None:
         plt.savefig(saveFig)
@@ -548,158 +550,3 @@ def isValidState(states):
     nS = states.shape[-1]
     invalid_state = getInvalidState(nS)
     return (states == invalid_state).sum(-1) < nS
-
-# def partitionDataIntoSquares(data, xdelta, window, window_small, cooldown, plot=False, timeit=False):
-#     if timeit:
-#         print("partitionDataIntoSquares() function.")
-#         s = time.time()
-#
-#     X = data[:, 0]
-#     Nmax = data.shape[0]
-#     nites = int(Nmax/window_small)
-#     mini = 0
-#     if plot: plt.plot(X)
-#
-#     minis = np.zeros((nites, 1))
-#     deltas = np.zeros((nites, 1))
-#
-#     lasti = cooldown * (-2)
-#
-#     partition = []
-#
-#     for i in range(nites):
-#         maxi = mini + window
-#         extract = X[mini:maxi]
-#         xdel = extract.max()-extract.min()
-#         if xdel < 20 and i - lasti > cooldown:
-#             if plot: plt.plot([mini, maxi], [-13000, -11000])
-#             lasti = i
-#             partition.append(mini)
-#         minis[i] = mini
-#         deltas[i] = xdel
-#         mini += window_small
-#
-#     if plot: plt.show()
-#
-#     if timeit: print("Time elapsed: % d" % (time.time()-s))
-#
-#     return partition
-#
-# def findSquareMinMaxVals(squarePartitionIndxs, data, plot=False):
-#     """ Finds the max and min X and Y values for each rectangular piece
-#
-#     squarePartitionIndx : list with data partition index (in each data partition
-#                           there is a piece), has length number of pieces + 1
-#     data : nparray (N, 2)
-#     plot: bool
-#     -------
-#     return: nparray (nS, 4) where nS is the number of squares, with structure
-#             [min X, max X, min Y, max Y]
-#
-#     """
-#     print('Finding the min and max values for each piece...')
-#     def findFirstLastPeak(data, peak, first):
-#         """ Returns the index of the first or last peak (value above "peak") within "data"
-#
-#         data  : nparray (N, )
-#         peak  : float
-#         first : bool - True for first peak, False for last peak
-#         -------
-#         return: int - index of peak
-#         """
-#         assert(data.ndim == 1)
-#         wheres = np.argwhere(data > peak)
-#         if wheres.size > 0:
-#             if first:
-#                 return wheres[0]
-#             else:
-#                 return wheres[-1]
-#         else:
-#             if first:
-#                 return data.shape[0]-1
-#             else:
-#                 return 0
-#
-#     def findFirstLastZeroZone(data, zoneSize, first):
-#         """ Returns the index of the first or last prolonged zero zone
-#
-#         A prolonged zero zone is where the data has more than zoneSize consecutive
-#         zero values.
-#
-#         data  : nparray (N, )
-#         peak  : float
-#         first : bool - True for first zero zone, False for last
-#         -------
-#         return: int - index of zero zone
-#         """
-#         whereNonZero = np.argwhere(data > 0).reshape(-1)
-#         indx = findFirstLastPeak(np.diff(whereNonZero).reshape(-1), zoneSize, first)
-#         return whereNonZero[indx]
-#
-#     X, Y = data[:, 0], data[:, 1]
-#     maxZeroStraight = 2000
-#
-#     n_squares = len(squarePartitionIndxs) - 1
-#     square_limits = np.zeros((n_squares, 4))
-#
-#     for square in range(n_squares):
-#         mini, maxi = squarePartitionIndxs[square], squarePartitionIndxs[square+1]
-#         Xe, Ye = X[mini:maxi], Y[mini:maxi]
-#         Xes, Yes = np.sort(Xe), np.sort(Ye)
-#         Xesd, Yesd = np.diff(Xes), np.diff(Yes)
-#
-#         # Calculate normal range of Xe/Ye variation during scanning
-#         per5 = int(Xe.shape[0] / 5) # 5%
-#         midv = int(Xe.shape[0] / 2) # Midpoint of data
-#         maxmidX = np.max(Xesd[midv-per5:midv+per5])
-#         maxmidY = np.max(Yesd[midv-per5:midv+per5])
-#
-#         # Using peaks
-#         peak1X = findFirstLastPeak(Xesd[0:midv], maxmidX, False)
-#         peak2X = findFirstLastPeak(Xesd[midv:-1], maxmidX, True) + midv
-#         peak1Y = findFirstLastPeak(Yesd[0:midv], maxmidY, False)
-#         peak2Y = findFirstLastPeak(Yesd[midv:-1], maxmidX, True) + midv
-#
-#         # Using zeros
-#         zero1X = findFirstLastZeroZone(Xesd[0:midv], maxZeroStraight, False)
-#         zero2X = findFirstLastZeroZone(Xesd[midv:-1], maxZeroStraight, True) + midv
-#         zero1Y = findFirstLastZeroZone(Yesd[0:midv], maxZeroStraight, False)
-#         zero2Y = findFirstLastZeroZone(Yesd[midv:-1], maxZeroStraight, True) + midv
-#
-#         # More restrictive index
-#         square_limits[square, 0] = Xes[int(max(peak1X, zero1X))] # Min X
-#         square_limits[square, 1] = Xes[int(min(peak2X, zero2X))] # Max X
-#         square_limits[square, 2] = Yes[int(max(peak1Y, zero1Y))] # Min Y
-#         square_limits[square, 3] = Yes[int(min(peak2Y, zero2Y))] # Max Y
-#
-#     if plot:
-#         plt.plot(X, Y)
-#         for square in range(n_squares):
-#             plt.plot([square_limits[square, 0], square_limits[square, 1],
-#                       square_limits[square, 1], square_limits[square, 0],
-#                       square_limits[square, 0]],
-#                      [square_limits[square, 2], square_limits[square, 2],
-#                       square_limits[square, 3], square_limits[square, 3],
-#                       square_limits[square, 2]],
-#                       'r')
-#         plt.show()
-#     return square_limits
-#
-# def getRectangleMinMaxFromFile(file_name, computePieceData=False):
-#     purge_prcnt = 0.1
-#
-#     data = loadData(file_name)
-#     data = purgeData(purge_prcnt, data)
-#     data_partition = partitionDataIntoSquares(data, 550, 500, 50, 200)
-#     square_limits = findSquareMinMaxVals(data_partition, data)
-#     if computePieceData:
-#         return square_limits, divideDataRectangleLimits(data, square_limits)
-#     else:
-#         return square_limits
-#
-# def getPieceDataFromFile(file_name, square_limits):
-#     purge_prcnt = 0.1
-#
-#     data = loadData(file_name)
-#     data = purgeData(purge_prcnt, data)
-#     return divideDataRectangleLimits(data, square_limits)

@@ -16,6 +16,9 @@ class Cluster:
         self.a_l = np.array([0.57, 75])
         self.a_u = np.array([1.8, 140])
 
+        self.action_state = 0 # slow, fast
+        self.n_states = 2
+
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
     # --------------------------------------------------------------------------
@@ -49,7 +52,17 @@ class Cluster:
     def computeAction(self, states):
         """Return control action given the current machine state"""
         self.state_traj.append(states)
-        action = np.random.rand(self.n_pieces, 2)*(self.a_u-self.a_l)+self.a_l
+        action = np.zeros((states.shape[0], 2))
+
+        use_state = self.action_state
+        for i in range(states.shape[0]):
+            if use_state == 0:
+                action[i,0] = 0.57
+            elif use_state == 1:
+                action[i,0] = 1.8
+            use_state = (use_state+1) % self.n_states
+        self.action_state = (self.action_state+1)%self.n_states
+
         print("Action selected", action)
         return action
 

@@ -1,4 +1,4 @@
-from config import returnSharedCfg, returnMachineCfg
+from config_windows import returnSharedCfg, returnMachineCfg
 from aconity import Aconity
 import os
 import numpy as np
