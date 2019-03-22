@@ -1,2 +1,5 @@
 __pycache__/
 aconity/data/
+*.nns
+*.mat
+*.npy

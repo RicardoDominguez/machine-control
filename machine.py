@@ -50,7 +50,7 @@ class Machine:
     def getActions(self):
         """Read action file outputted by cluster"""
         print('Waiting for actions...')
-        dir_c = 'machine-control/' + self.s_cfg.comms.dir
+        dir_c = self.m_cfg.comms.cluster_dir + self.s_cfg.comms.dir
         dir_m = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.action
         rdy_c = dir_c + cfg.rdy_name
@@ -68,7 +68,7 @@ class Machine:
 
     def sendStates(self, states):
         """Send state information to cluster side"""
-        dir_c = 'machine-control/' + self.s_cfg.comms.dir
+        dir_c = self.m_cfg.comms.cluster_dir + self.s_cfg.comms.dir
         dir_m = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
 

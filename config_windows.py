@@ -18,6 +18,7 @@ shared config parameters
 machine config parameters
 ------------------------
     |- comms
+        |- cluster_dir   - directory in which machine-control/ is located on the cluster
         |- sftp         - sftp config
             |- host
             |- user
@@ -50,6 +51,7 @@ def returnSharedCfg():
 def returnMachineCfg():
     cfg = DotMap()
 
+    cfg.comms.cluster_dir = 'machine-control/'
     cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
     cfg.comms.sftp.user = 'ricardo'
     cfg.comms.sftp.pwd = 'aw%qzv'
