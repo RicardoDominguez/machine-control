@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 class Cluster:
-    def __init__(self, shared_cfg, contol_cfg):
+    def __init__(self, shared_cfg, control_cfg):
         self.s_cfg = shared_cfg
         self.c_cfg = control_cfg
 
@@ -16,8 +16,10 @@ class Cluster:
         self.a_l = np.array([0.57, 75])
         self.a_u = np.array([1.8, 140])
 
+        self.n_parts = 4 # GET THIS DIRECTLY FROM CONFIG
+
         self.action_state = 0 # slow, fast
-        self.n_states = 2
+        self.n_states = 4
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -55,18 +57,51 @@ class Cluster:
         action = np.zeros((states.shape[0], 2))
 
         use_state = self.action_state
-        for i in range(states.shape[0]):
+        for i in range(self.n_parts):
             if use_state == 0:
                 action[i,0] = 0.57
+                action[i,1] = 75
             elif use_state == 1:
                 action[i,0] = 1.8
+                action[i,1] = 75
+            elif use_state == 2:
+                action[i,0] = 0.57
+                action[i,1] = 140
+            elif use_state == 3:
+                action[i,0] = 1.8
+                action[i,1] = 140
             use_state = (use_state+1) % self.n_states
         self.action_state = (self.action_state+1)%self.n_states
 
         print("Action selected", action)
         return action
+        
+    def initAction(self):
+        action = np.zeros((self.n_parts, 2))
+
+        use_state = self.action_state
+        for i in range(self.n_parts):
+            if use_state == 0:
+                action[i,0] = 0.57
+                action[i,1] = 75
+            elif use_state == 1:
+                action[i,0] = 1.8
+                action[i,1] = 75
+            elif use_state == 2:
+                action[i,0] = 0.57
+                action[i,1] = 140
+            elif use_state == 3:
+                action[i,0] = 1.8
+                action[i,1] = 140
+            use_state = (use_state+1) % self.n_states
+        self.action_state = (self.action_state+1)%self.n_states
+
+        print("Action selected", action)
+        return action
+        
 
     def loop(self):
+        self.sendAction(self.initAction())
         while(True):
             states = self.getStates()
             actions = self.computeAction(states)
