@@ -27,7 +27,7 @@ class Machine:
         # Simulated environment
         self.env = MachineModelEnv('sim_model/', 'env', ac_cost, obs_cost_fn, stochastic=True, randInit=True)
         self.n_parts = machine_cfg.aconity.n_parts
-        self.horizon = machine_cfg.aconity.layers[1]-machine_cfg.aconity.layers[0]
+        self.horizon = machine_cfg.aconity.layers[1]-machine_cfg.aconity.layers[0]+1
         self.t = 0
         self.states = np.zeros((self.horizon+1, self.n_parts, 16))
         self.actions = np.zeros((self.horizon, self.n_parts, 2))

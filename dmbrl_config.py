@@ -10,10 +10,6 @@ from dmbrl.misc.DotmapUtils import get_required_argument
 CEM_ALPHA = 0.1
 CEM_EPS = 0.001
 
-# Policy search parameters
-# ------------------------------------------------------------------------------
-NTRAIN_ITERS = 5
-
 # Model parameters
 # ------------------------------------------------------------------------------
 MODEL_IN, MODEL_OUT = 18, 16
@@ -74,8 +70,8 @@ def ac_cost_fn(acs):
 def create_dmbrl_config():
     cfg = DotMap()
 
-    cfg.ctrl_cfg.nO = 16
-    cfg.ctrl_cfg.nU = 2
+    cfg.ctrl_cfg.dO = 16
+    cfg.ctrl_cfg.dU = 2
 
     cfg.ctrl_cfg.prop_cfg.model_init_cfg = DotMap(
         model_class = BNN,
@@ -98,5 +94,15 @@ def create_dmbrl_config():
     cfg.ctrl_cfg.log_cfg.save_all_models = False
     cfg.ctrl_cfg.log_cfg.log_traj_preds = False
     cfg.ctrl_cfg.log_cfg.log_particles = False
+
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_in = MODEL_IN
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_out = MODEL_OUT
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.n_layers = 3
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.n_neurons = 750
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.wd_in = 8.213e-05
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.wd_hid = 1.188e-05
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.wd_out = 1.004e-05
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.learning_rate = 3.61e-4
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_constructor = bnn_constructor
 
     return cfg

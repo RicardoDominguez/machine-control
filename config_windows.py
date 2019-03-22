@@ -36,8 +36,10 @@ machine config parameters
         |- open_loop    - settings for open loop parts
 """
 from dotmap import DotMap
+import numpy as np
 
 def get_n_parts(): return 4
+def get_layers(): return [1, 166]
 
 def returnSharedCfg():
     cfg = DotMap()
@@ -48,6 +50,9 @@ def returnSharedCfg():
     cfg.comms.state.rdy_name = 'state_rdy'
     cfg.comms.state.f_name = 'states.npy'
     cfg.env.nS = 16
+    cfg.env.n_parts = get_n_parts()
+    layers = get_layers()
+    cfg.env.horizon = layers[1]-layers[0]+1
 
     return cfg
 
@@ -60,7 +65,7 @@ def returnMachineCfg():
     cfg.comms.sftp.pwd = 'aw%qzv'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring'
     cfg.aconity.info.job_name = 'ControlTest'
-    cfg.aconity.layers = [1, 166]
+    cfg.aconity.layers = get_layers()
     cfg.aconity.n_parts = get_n_parts()
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
     cfg.aconity.process.sleep_t = 5
