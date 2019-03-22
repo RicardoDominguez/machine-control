@@ -17,9 +17,9 @@ from AconitySTUDIO_client import utils
 
 from process.mainFile import *
 
-def pieceNumber(piece_indx):
+def pieceNumber(piece_indx, n_ignore):
     """ 0->4, 1->7, 2->10, etc... """
-    return int((piece_indx+1)*3+1)
+    return int((piece_indx+n_ignore)*3+1)
 
 def getLoginData():
     login_data = { 'rest_url' : f'http://localhost:9000',
@@ -49,6 +49,7 @@ class Aconity:
         self.job_started = False
         self.curr_layer = machine_cfg.aconity.layers[0]
         self.job_paused = False
+        self.n_ignore = 1 + machine_cfg.aconity.open_loop.shape[0]
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -87,11 +88,20 @@ class Aconity:
         await self.client.get_session_id(n=-1)
         print("Done init")
 
+    async def initialParameterSettings(self):
+        # First one purely scanning slowly
+        await self.client.change_part_parameter(1, 'mark_speed', 400)
+        # Parameters that will remain unchanged
+        open_loop = self.m_cfg.aconity.open_loop
+        for i in range(open_loop.shape[0]):
+            await self.client.change_part_parameter(pieceNumber(i, 1), 'mark_speed', open_loop[i,0])
+            await self.client.change_part_parameter(pieceNumber(i, 1), 'laser_power', open_loop[i,1])
+
     async def _changeMarkSpeed(self, part, value):
-        await self.client.change_part_parameter(pieceNumber(part), 'mark_speed', value)
+        await self.client.change_part_parameter(pieceNumber(part, self.n_ignore), 'mark_speed', value)
 
     async def _changeLaserPower(self, part, value):
-        await self.client.change_part_parameter(pieceNumber(part), 'laser_power', value)
+        await self.client.change_part_parameter(pieceNumber(part, self.n_ignore), 'laser_power', value)
 
     async def _pauseUponLayerCompletion(self, sleep_time=0.05):
         """ sleep time in seconds """
@@ -124,8 +134,7 @@ class Aconity:
         else:
             execution_script = getUnheatedMonitoringExecutionScript()
             await self.client.start_job(cfg.layers, execution_script)
-            # First very slow, in case job pausing is delayed a bit
-            await self.client.change_part_parameter(1, 'mark_speed', 400)
+            await self.initialParameterSettings()
             print("Job started...")
             self.job_started = True
             self.sendStates()

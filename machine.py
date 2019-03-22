@@ -10,9 +10,9 @@ import re
 
 from process.process_main import *
 
-def pieceNumber(piece_indx):
+def pieceNumber(piece_indx, n_ignore):
     """ 0->4, 1->7, 2->10, etc... """
-    return int((piece_indx+1)*3+1)
+    return int((piece_indx+n_ignore)*3+1)
 
 class Machine:
     def __init__(self, shared_cfg, machine_cfg):
@@ -26,6 +26,8 @@ class Machine:
         self.curr_layer = machine_cfg.aconity.layers[0]
         self.rectangle_limits_computed = np.zeros((self.m_cfg.aconity.n_parts,), dtype=bool)
         self.square_limits = []
+
+        self.n_ignore = 1 + machine_cfg.aconity.open_loop.shape[0]
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -114,7 +116,7 @@ class Machine:
         print("Data folder found is " + self.data_folder)
 
     def getFileName(self, layer, piece):
-        return self.data_folder+str(pieceNumber(piece))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
+        return self.data_folder+str(pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
 
     def getStates(self):
         """Read raw data from the pyrometer and processes it into states"""

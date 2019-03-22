@@ -19,7 +19,7 @@ machine config parameters
 ------------------------
     |- comms
         |- cluster_dir   - directory in which machine-control/ is located on the cluster
-        |- sftp         - sftp config
+        |- sftp          - sftp config
             |- host
             |- user
             |- pwd
@@ -33,8 +33,11 @@ machine config parameters
             |- sess_dir - folder where data is logged
             |- sleep_t  - after detecting file and before reading it
             |- debug_dir- save information useful for debuging
+        |- open_loop    - settings for open loop parts
 """
 from dotmap import DotMap
+
+def get_n_parts(): return 4
 
 def returnSharedCfg():
     cfg = DotMap()
@@ -58,7 +61,8 @@ def returnMachineCfg():
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring'
     cfg.aconity.info.job_name = 'ControlTest'
     cfg.aconity.layers = [1, 166]
-    cfg.aconity.n_parts = 4
+    cfg.aconity.n_parts = get_n_parts()
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
     cfg.aconity.process.sleep_t = 5
+    cfg.aconity.open_loop = np.array([[1.125, 110]])
     return cfg

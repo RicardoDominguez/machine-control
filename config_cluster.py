@@ -3,6 +3,7 @@ control config parameters
 -------------------------
     |- pretrained       - learns or model is given
     |- train_freq       - model is learned after this number of layers
+    |- n_parts          - number of physical parts being built
     |- ctrl_cfg
         |- per          - reoptimization frequency
         |- ac_ub        - action upper bounds
@@ -33,12 +34,15 @@ control config parameters
 """
 from dotmap import DotMap
 from dmbrl_config import create_dmbrl_config
+from config_windows import get_n_parts
+import numpy as np
 
 def returnClusterPretrainedCfg():
     cfg = create_dmbrl_config()
 
     cfg.pretrained = True
     cfg.train_freq = None
+    cfg.n_parts = get_n_parts()
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------
