@@ -162,6 +162,17 @@ class Machine:
         os.mkdir(rdy) # RDY signal
         print('Actions saved')
 
+    def test_loop(self):
+        initialised=False
+        while(True):
+            states = self.getStates()
+            if not initialised:
+                state_log = np.empty((0, states.shape[0], states.shape[1]))
+                initialised = True
+            state_log = np.concatenate((state_log, states[None]), axis=0)
+            print("Saving states...")
+            np.save("states.npy", state_log)
+
     def loop(self):
         while(True):
             self.getActions()

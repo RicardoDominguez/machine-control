@@ -142,6 +142,11 @@ class Aconity:
         await self._pauseUponLayerCompletion()
         self.curr_layer += 1
 
+    async def test_loop(self, actions):
+        max_layer = self.m_cfg.aconity.layers[1]
+        while self.curr_layer <= max_layer:
+            await self.performLayer(actions)
+
     async def loop(self):
         max_layer = self.m_cfg.aconity.layers[1]
         while self.curr_layer <= max_layer:
