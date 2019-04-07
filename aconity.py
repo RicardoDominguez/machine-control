@@ -15,11 +15,13 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 from AconitySTUDIO_client import AconitySTUDIOPythonClient
 from AconitySTUDIO_client import utils
 
-from process.mainFile import *
+from process.process_main import *
 
 def pieceNumber(piece_indx, n_ignore):
     """ 0->4, 1->7, 2->10, etc... """
-    return int((piece_indx+n_ignore)*3+1)
+    """ 0->2, 1->3, 2->4, etc..."""
+    #return int((piece_indx+n_ignore)*3+1)
+    return int((piece_indx+n_ignore)+1)
 
 def getLoginData():
     login_data = { 'rest_url' : f'http://localhost:9000',
@@ -49,7 +51,15 @@ class Aconity:
         self.job_started = False
         self.curr_layer = machine_cfg.aconity.layers[0]
         self.job_paused = False
-        self.n_ignore = 1 + machine_cfg.aconity.open_loop.shape[0]
+
+        self.n_ignore_buffer = shared_cfg.n_ignore_buffer
+        self.n_ignore = self.n_ignore_buffer + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
+
+        self.n_rand = shared_cfg.n_rand
+        self.n_ignore_rand = self.n_ignore_buffer + machine_cfg.aconity.open_loop.shape[0]
+
+        self.lb = shared_cfg.ctrl_cfg.lb
+        self.ub = shared_cfg.ctrl_cfg.ub
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -89,13 +99,15 @@ class Aconity:
         print("Done init")
 
     async def initialParameterSettings(self):
-        # First one purely scanning slowly
-        await self.client.change_part_parameter(1, 'mark_speed', 400)
+        # Slowly scan the ones ignored
+        for i in range(self.n_ignore_buffer):
+            await self.client.change_part_parameter(i+1, 'mark_speed', 400)
+
         # Parameters that will remain unchanged
         open_loop = self.m_cfg.aconity.open_loop
         for i in range(open_loop.shape[0]):
-            await self.client.change_part_parameter(pieceNumber(i, 1), 'mark_speed', open_loop[i,0])
-            await self.client.change_part_parameter(pieceNumber(i, 1), 'laser_power', open_loop[i,1])
+            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_buffer), 'mark_speed', open_loop[i,0]*1000)
+            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_buffer), 'laser_power', open_loop[i,1])
 
     async def _changeMarkSpeed(self, part, value):
         await self.client.change_part_parameter(pieceNumber(part, self.n_ignore), 'mark_speed', value)
@@ -115,9 +127,17 @@ class Aconity:
 
     async def performLayer(self, actions):
         """Start building next layer with the specified parameters"""
+        print("Actions chosen", actions)
         cfg = self.m_cfg.aconity
         assert cfg.n_parts == actions.shape[0], \
             "Mismatch %d != %d" % (cfg.n_parts, actions.shape[0])
+
+        # Random parameters
+        rand_param = np.random.rand(self.n_rand, 2)*(self.ac_ub-self.ac_lb)+self.ac_lb
+        for i in range(self.n_rand):
+            print("Rand", i, "Setting parameters...", rand_param[i, :])
+            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_rand), 'mark_speed', rand_param[i,0]*1000)
+            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_rand), 'laser_power', rand_param[i,1])
 
         # Change parameters
         for part in range(cfg.n_parts):
@@ -138,6 +158,10 @@ class Aconity:
             print("Job started...")
             self.job_started = True
             self.sendStates()
+
+        # Log actions taken
+        np.save("saves/rand_param_l_%d.npy" % (self.curr_layer), rand_param)
+        np.save("saves/param_l_%d.npy" % (self.curr_layer), actions)
 
         await self._pauseUponLayerCompletion()
         self.curr_layer += 1

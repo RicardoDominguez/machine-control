@@ -23,7 +23,10 @@ def getLatestConfigJobFolder(folder_name, init_str):
     return name
 
 def pieceNumber(piece_indx):
-    return (piece_indx+1)*3+1
+    #return (piece_indx+1)*3+1
+    # return (piece_indx+1)+1
+    return (piece_indx+3)+1
+
 
 def getNextLayerPiece(layer, piece_indx, n_pieces, retPieces=True):
     next_layer = layer
@@ -71,10 +74,10 @@ while(True):
     #if curr_piece_indx <= last_curr_piece_indx:
     print("Sleeping...")
     time.sleep(copy_waitTime)
-    
+
     data = np.loadtxt(expected_file)
     print("Data shape is", data.shape)
-    
+
     print("Red layer %d, piece %d" % (curr_layer, curr_piece_indx))
     print("File name "+expected_file)
     curr_layer, curr_piece_indx = getNextLayerPiece(curr_layer, curr_piece_indx, n_pieces, retPieces=False)
