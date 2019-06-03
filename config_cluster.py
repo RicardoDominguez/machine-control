@@ -67,7 +67,7 @@ def returnClusterPretrainedCfg():
 
     cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 500
     cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 10
-    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] = int(500*0.05)
+    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] =int(500*0.05)
 
     cfg.ctrl_cfg.prop_cfg.mode = "TS1"
 
@@ -78,7 +78,7 @@ def returnClusterUnfamiliarCfg():
     cfg = create_dmbrl_config()
 
     cfg.pretrained = False
-    cfg.train_freq = 5
+    cfg.train_freq = 1
     cfg.n_parts = 10
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
@@ -90,10 +90,10 @@ def returnClusterUnfamiliarCfg():
 
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = False
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = ''
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 'learned_model'
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 's75_2'
 
 
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 1
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 5
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["batch_size"] = 32
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["epochs"] = 5
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["hide_progress"] = False

@@ -39,7 +39,7 @@ from dotmap import DotMap
 import numpy as np
 
 def get_n_parts(): return 20
-def get_layers(): return [1, 160]
+def get_layers(): return [1, 153]
 
 def returnSharedCfg():
     cfg = DotMap()
@@ -58,7 +58,7 @@ def returnSharedCfg():
     cfg.save_dir2 = ''#'/home/ricardo/'
 
     cfg.n_ignore_buffer = 3
-    cfg.n_rand = 10
+    cfg.n_rand = 0
 
     cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
     cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
@@ -68,27 +68,20 @@ def returnSharedCfg():
 def returnMachineCfg():
     cfg = DotMap()
 
-    #cfg.comms.cluster_dir = 'machine-control/'
-    #cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
-    #cfg.comms.sftp.user = 'ricardo'
-    #cfg.comms.sftp.pwd = 'aw%qzv'
-    cfg.comms.cluster_dir = '/data/coa16r/mod/machine-control-latest-2-1/'
-    cfg.comms.sftp.host = 'sharc.shef.ac.uk'
-    cfg.comms.sftp.user = 'coa16r'
-    cfg.comms.sftp.pwd = 'Pazz2314'
+    cfg.comms.cluster_dir = 'machine-control/'
+    cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
+    cfg.comms.sftp.user = 'ricardo'
+    cfg.comms.sftp.pwd = 'aw%qzv'
+    # cfg.comms.cluster_dir = '/data/coa16r/machine-control/'
+    # cfg.comms.sftp.host = 'sharc.shef.ac.uk'
+    # cfg.comms.sftp.user = 'coa16r'
+    # cfg.comms.sftp.pwd = 'Pazz2314'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring Recalibrated'
-    cfg.aconity.info.job_name = 'PowerTest'
+    cfg.aconity.info.job_name = 'H282Control2'
     cfg.aconity.layers = get_layers()
     cfg.aconity.n_parts = get_n_parts()
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
-    cfg.aconity.process.sleep_t = 5
-    cfg.aconity.open_loop = np.array([[1, 140],
-                                      [1, 75],
-                                      [1.5, 140],
-                                      [1.5, 75],
-                                      [1, 90],
-                                      [1, 110]])
-                                      #[1, 0]])
-                                      # [3, 0],
-                                      # [0.5, 0]])
+    cfg.aconity.process.sleep_t = 2.5
+
+    cfg.aconity.open_loop = np.ones((10,2))*[1.125, 110]
     return cfg

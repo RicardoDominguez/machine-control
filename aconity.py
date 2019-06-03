@@ -52,14 +52,24 @@ class Aconity:
         self.curr_layer = machine_cfg.aconity.layers[0]
         self.job_paused = False
 
-        self.n_ignore_buffer = shared_cfg.n_ignore_buffer
-        self.n_ignore = self.n_ignore_buffer + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
-
+        # self.n_ignore_buffer = shared_cfg.n_ignore_buffer
+        # self.n_ignore = self.n_ignore_buffer + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
+        #
         self.n_rand = shared_cfg.n_rand
-        self.n_ignore_rand = self.n_ignore_buffer + machine_cfg.aconity.open_loop.shape[0]
+        # self.n_ignore_rand = self.n_ignore_buffer + machine_cfg.aconity.open_loop.shape[0]
 
-        self.lb = shared_cfg.ctrl_cfg.lb
-        self.ub = shared_cfg.ctrl_cfg.ub
+        self.n_ignore_buffer = shared_cfg.n_ignore_buffer
+        self.cl_buffer = shared_cfg.n_ignore_buffer
+        self.ol_buffer = self.cl_buffer + shared_cfg.env.n_parts
+        self.rnd_buffer = self.ol_buffer + machine_cfg.aconity.open_loop.shape[0]
+
+        #
+        # self.n_ignore = self.n_ignore_buffer + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
+        #
+        # self.n_ignore_rand = self.n_ignore_buffer + machine_cfg.aconity.open_loop.shape[0]
+
+        self.ac_lb = shared_cfg.ctrl_cfg.ac_lb
+        self.ac_ub = shared_cfg.ctrl_cfg.ac_ub
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -71,8 +81,14 @@ class Aconity:
 
         # Wait until RDY signal is provided
         print("Waiting for actions...")
-        while(not os.path.isdir(rdy)): await asyncio.sleep(0.05)
-        os.rmdir(rdy) # Delete RDY
+        no_error = 1
+        while(no_error):
+            while(not os.path.isdir(rdy)): await asyncio.sleep(0.05)
+            try:
+                os.rmdir(rdy) # Delete RDY
+                no_error = 0
+            except:
+                pass
 
         # Read data to array
         actions = np.load(dir+cfg.f_name)
@@ -101,19 +117,20 @@ class Aconity:
     async def initialParameterSettings(self):
         # Slowly scan the ones ignored
         for i in range(self.n_ignore_buffer):
-            await self.client.change_part_parameter(i+1, 'mark_speed', 400)
+            await self.client.change_part_parameter(i+1, 'mark_speed', 3000)
 
         # Parameters that will remain unchanged
         open_loop = self.m_cfg.aconity.open_loop
         for i in range(open_loop.shape[0]):
-            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_buffer), 'mark_speed', open_loop[i,0]*1000)
-            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_buffer), 'laser_power', open_loop[i,1])
+            await self.client.change_part_parameter(pieceNumber(i, self.ol_buffer), 'mark_speed', open_loop[i,0]*1000)
+            await self.client.change_part_parameter(pieceNumber(i, self.ol_buffer), 'laser_power', open_loop[i,1])
 
     async def _changeMarkSpeed(self, part, value):
-        await self.client.change_part_parameter(pieceNumber(part, self.n_ignore), 'mark_speed', value)
+        print("Writing speed to %d " % (pieceNumber(part, self.cl_buffer)))
+        await self.client.change_part_parameter(pieceNumber(part, self.cl_buffer), 'mark_speed', value)
 
     async def _changeLaserPower(self, part, value):
-        await self.client.change_part_parameter(pieceNumber(part, self.n_ignore), 'laser_power', value)
+        await self.client.change_part_parameter(pieceNumber(part, self.cl_buffer), 'laser_power', value)
 
     async def _pauseUponLayerCompletion(self, sleep_time=0.05):
         """ sleep time in seconds """
@@ -135,9 +152,9 @@ class Aconity:
         # Random parameters
         rand_param = np.random.rand(self.n_rand, 2)*(self.ac_ub-self.ac_lb)+self.ac_lb
         for i in range(self.n_rand):
-            print("Rand", i, "Setting parameters...", rand_param[i, :])
-            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_rand), 'mark_speed', rand_param[i,0]*1000)
-            await self.client.change_part_parameter(pieceNumber(i, self.n_ignore_rand), 'laser_power', rand_param[i,1])
+            print("Rand", i, "Piece", pieceNumber(i, self.rnd_buffer), "Setting parameters...", rand_param[i, :])
+            await self.client.change_part_parameter(pieceNumber(i, self.rnd_buffer), 'mark_speed', rand_param[i,0]*1000)
+            await self.client.change_part_parameter(pieceNumber(i, self.rnd_buffer), 'laser_power', rand_param[i,1])
 
         # Change parameters
         for part in range(cfg.n_parts):
