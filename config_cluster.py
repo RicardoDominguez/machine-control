@@ -42,7 +42,7 @@ def returnClusterPretrainedCfg():
 
     cfg.pretrained = True
     cfg.train_freq = None
-    cfg.n_parts = get_n_parts()
+    cfg.n_parts = 10
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------
@@ -51,7 +51,6 @@ def returnClusterPretrainedCfg():
     cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
     cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
 
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 1
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = True
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = 'dmbrl/trained_models/'
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 'pretrained_model'
@@ -61,16 +60,16 @@ def returnClusterPretrainedCfg():
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["epochs"] = 5
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["hide_progress"] = False
 
-    cfg.ctrl_cfg.prop_cfg.npart = 2
+    cfg.ctrl_cfg.prop_cfg.npart = 20
 
     cfg.ctrl_cfg.opt_cfg.mode = "CEM"
     cfg.ctrl_cfg.opt_cfg.plan_hor = 1
 
-    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 150
-    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 5
-    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] = int(150*0.15)
+    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 500
+    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 10
+    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] =int(500*0.05)
 
-    cfg.ctrl_cfg.prop_cfg.mode = "TSinf"
+    cfg.ctrl_cfg.prop_cfg.mode = "TS1"
 
     return cfg
 
@@ -79,7 +78,8 @@ def returnClusterUnfamiliarCfg():
     cfg = create_dmbrl_config()
 
     cfg.pretrained = False
-    cfg.train_freq = 5
+    cfg.train_freq = 1
+    cfg.n_parts = 10
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------
@@ -88,26 +88,25 @@ def returnClusterUnfamiliarCfg():
     cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
     cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
 
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 1
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = False
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = ''
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 'model'
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 's75_2'
 
 
-    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 1
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 5
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["batch_size"] = 32
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["epochs"] = 5
     cfg.ctrl_cfg.prop_cfg.model_train_cfg["hide_progress"] = False
 
-    cfg.ctrl_cfg.prop_cfg.npart = 1
+    cfg.ctrl_cfg.prop_cfg.npart = 20
 
     cfg.ctrl_cfg.opt_cfg.mode = "CEM"
     cfg.ctrl_cfg.opt_cfg.plan_hor = 1
 
-    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 150
-    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 5
-    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] = int(150*0.15)
+    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 500
+    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 10
+    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] = int(500*0.05)
 
-    cfg.ctrl_cfg.prop_cfg.mode = "TSinf"
+    cfg.ctrl_cfg.prop_cfg.mode = "TS1"
 
     return cfg

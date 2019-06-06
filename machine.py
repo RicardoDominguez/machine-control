@@ -12,7 +12,7 @@ from process.process_main import *
 
 def pieceNumber(piece_indx, n_ignore):
     """ 0->4, 1->7, 2->10, etc... """
-    return int((piece_indx+n_ignore)*3+1)
+    return int((piece_indx+n_ignore)+1)
 
 class Machine:
     def __init__(self, shared_cfg, machine_cfg):
@@ -27,7 +27,9 @@ class Machine:
         self.rectangle_limits_computed = np.zeros((self.m_cfg.aconity.n_parts,), dtype=bool)
         self.square_limits = []
 
-        self.n_ignore = 1 + machine_cfg.aconity.open_loop.shape[0]
+        self.state_log = None
+
+        self.n_ignore = shared_cfg.n_ignore_buffer# + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -40,8 +42,10 @@ class Machine:
         comms = self.s_cfg.comms
 
         # Set up connection
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
         self.sftp = pysftp.Connection(host=cfg.host, username=cfg.user,
-            password=cfg.pwd)
+            password=cfg.pwd, cnopts=cnopts)
 
         # Create comms dir and cd to it
         if not os.path.isdir(comms.dir): os.mkdir(comms.dir)
@@ -132,18 +136,23 @@ class Machine:
         n_div = int(np.sqrt(nS))
         layer = self.curr_layer
         states = np.zeros((cfg.n_parts, nS))
+        n_cumul = 0
+        max_cumul = 7
         for part in range(cfg.n_parts):
             filename = self.getFileName(layer, part)
             print("Expected file "+filename)
             while(not os.path.isfile(filename)): time.sleep(0.05)
-            time.sleep(cfg.process.sleep_t) # Prevent reading too soon
+            if n_cumul < max_cumul:
+                time.sleep(cfg.process.sleep_t) # Prevent reading too soon
+            n_cumul+=1
 
             # Read and process data
-            data = loadData(filename)
+            data = loadData(filename,timeit=True)
             if not self.rectangle_limits_computed[part]:
                 self.square_limits.append(divideSingleSquare(data))
                 print("Square limits found", self.square_limits[-1])
                 self.rectangle_limits_computed[part] = True
+            #`data = purgeData(0.25, data)
             data, cutoff = removeColdLines(data, returnMode=2)
             print("Cut-off value is %d" % (cutoff))
             data, ratio, error = divideDataRectangleLimits(data,
@@ -173,8 +182,16 @@ class Machine:
             print("Saving states...")
             np.save("states.npy", state_log)
 
+    def log(self, states):
+        if self.state_log is None:
+            self.state_log = np.empty((0, states.shape[0], states.shape[1]))
+        self.state_log = np.concatenate((self.state_log, states[None]), axis=0)
+        np.save("saves/machinestate_log.npy", self.state_log)
+
+
     def loop(self):
         while(True):
             self.getActions()
             states = self.getStates()
             self.sendStates(states)
+            self.log(states)
