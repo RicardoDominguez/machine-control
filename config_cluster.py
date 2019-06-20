@@ -33,8 +33,7 @@ control config parameters
                 |- mode - ie "TSinf"
 """
 from dotmap import DotMap
-from dmbrl_config import create_dmbrl_config
-from config_windows import get_n_parts
+from config_dmbrl import create_dmbrl_config
 import numpy as np
 
 def returnClusterPretrainedCfg():

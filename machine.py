@@ -10,10 +10,6 @@ import re
 
 from process.process_main import *
 
-def pieceNumber(piece_indx, n_ignore):
-    """ 0->4, 1->7, 2->10, etc... """
-    return int((piece_indx+n_ignore)+1)
-
 class Machine:
     def __init__(self, shared_cfg, machine_cfg):
         self.s_cfg = shared_cfg
@@ -24,12 +20,12 @@ class Machine:
         # Aconity variables
         self.processing_uninitialised = True
         self.curr_layer = machine_cfg.aconity.layers[0]
-        self.rectangle_limits_computed = np.zeros((self.m_cfg.aconity.n_parts,), dtype=bool)
+        self.rectangle_limits_computed = np.zeros((self.s_cfg.env.n_parts,), dtype=bool)
         self.square_limits = []
 
         self.state_log = None
 
-        self.n_ignore = shared_cfg.n_ignore_buffer# + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
+        self.n_ignore = shared_cfg.parts_ignored
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -53,6 +49,13 @@ class Machine:
 
         print("SFTP initialised")
 
+    def clearComms(self):
+        cfg = self.s_cfg.comms
+        dir_action = cfg.dir+cfg.action.rdy_name
+        dir_state = cfg.dir+cfg.state.rdy_name
+        if os.path.isdir(dir_action): os.rmdir(dir_action)
+        if os.path.isdir(dir_state): os.rmdir(dir_state)
+
     def getActions(self):
         """Read action file outputted by cluster"""
         print('Waiting for actions...')
@@ -63,6 +66,7 @@ class Machine:
         rdy_m = dir_m + cfg.rdy_name
 
         # Wait until RDY signal is provided
+        print('Listening to remote '+rdy_c)
         while(not self.sftp.isdir(rdy_c)): pass
         self.sftp.rmdir(rdy_c) # Delete RDY
 
@@ -91,6 +95,11 @@ class Machine:
     # --------------------------------------------------------------------------
     # PROCESS FUNCTIONS
     # --------------------------------------------------------------------------
+    def pieceNumber(self, piece_indx, buffer):
+        """ 0->4, 1->7, 2->10, etc... """
+        """ 0->2, 1->3, 2->4, etc..."""
+        return int((piece_indx+buffer)*self.m_cfg.aconity.part_delta+1)
+
     def initProcessing(self):
         cfg = self.m_cfg.aconity.process
         def getLatestSession(folder_name):
@@ -120,7 +129,7 @@ class Machine:
         print("Data folder found is " + self.data_folder)
 
     def getFileName(self, layer, piece):
-        return self.data_folder+str(pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
+        return self.data_folder+str(self.pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
 
     def getStates(self):
         """Read raw data from the pyrometer and processes it into states"""
@@ -135,10 +144,11 @@ class Machine:
         nS = self.s_cfg.env.nS
         n_div = int(np.sqrt(nS))
         layer = self.curr_layer
-        states = np.zeros((cfg.n_parts, nS))
+        n_parts = self.s_cfg.env.n_parts
+        states = np.zeros((n_parts, nS))
         n_cumul = 0
         max_cumul = 7
-        for part in range(cfg.n_parts):
+        for part in range(n_parts):
             filename = self.getFileName(layer, part)
             print("Expected file "+filename)
             while(not os.path.isfile(filename)): time.sleep(0.05)
@@ -195,3 +205,12 @@ class Machine:
             states = self.getStates()
             self.sendStates(states)
             self.log(states)
+
+
+if __name__ == '__main__':
+    from config_windows import returnSharedCfg, returnMachineCfg
+
+    s_cfg = returnSharedCfg()
+    m_cfg = returnMachineCfg()
+    machine = Machine(s_cfg, m_cfg)
+    machine.loop()

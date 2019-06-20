@@ -1,6 +1,7 @@
 from dotmap import DotMap
 import numpy as np
 import tensorflow as tf
+import config_windows as cfg_global
 from dmbrl.modeling.models import BNN
 from dmbrl.modeling.layers import FC
 from dmbrl.misc.DotmapUtils import get_required_argument
@@ -54,7 +55,7 @@ def targ_proc(obs, next_obs):
 # Cost functions
 # ------------------------------------------------------------------------------
 def obs_cost_fn(obs):
-    target = 980
+    target = cfg_global.TEMPERATURE_TARGET
     k = 1000
     if isinstance(obs, np.ndarray):
         return -np.exp(-np.sum(np.square((obs-target)), axis=-1)/k)

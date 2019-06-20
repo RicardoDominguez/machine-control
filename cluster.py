@@ -33,9 +33,17 @@ class Cluster:
 
         self.save_dirs = [shared_cfg.save_dir1, shared_cfg.save_dir2]
 
+        self.clearComms()
+
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
     # --------------------------------------------------------------------------
+    def clearComms(self):
+        cfg = self.s_cfg.comms
+        dir_action = cfg.dir+cfg.action.rdy_name
+        dir_state = cfg.dir+cfg.state.rdy_name
+        if os.path.isdir(dir_action): os.rmdir(dir_action)
+        if os.path.isdir(dir_state): os.rmdir(dir_state)
 
     def getStates(self):
         """Read current system state outputted by machine"""
@@ -100,9 +108,7 @@ class Cluster:
         return action
 
     def initAction(self):
-        # Init with 1.125, 110
-        print("Initial action is 1.125, 110")
-        return np.ones((self.s_cfg.env.n_parts, 2)) * [1.125, 110]
+        return np.ones((self.s_cfg.env.n_parts, 2)) * self.s_cfg.env.init_params
 
     def log(self):
         for i in range(len(self.save_dirs)):
