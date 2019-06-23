@@ -49,13 +49,6 @@ class Machine:
 
         print("SFTP initialised")
 
-    def clearComms(self):
-        cfg = self.s_cfg.comms
-        dir_action = cfg.dir+cfg.action.rdy_name
-        dir_state = cfg.dir+cfg.state.rdy_name
-        if os.path.isdir(dir_action): os.rmdir(dir_action)
-        if os.path.isdir(dir_state): os.rmdir(dir_state)
-
     def getActions(self):
         """Read action file outputted by cluster"""
         print('Waiting for actions...')
@@ -157,7 +150,17 @@ class Machine:
             n_cumul+=1
 
             # Read and process data
-            data = loadData(filename,timeit=True)
+
+            # Try to prevent wierd exceptions
+            no_error = 1
+            while(no_error):
+                try:
+                    data = loadData(filename,timeit=True)
+                    no_error = 0
+                except:
+                    print("Something went wrong reading the data...")
+                    pass
+                    
             if not self.rectangle_limits_computed[part]:
                 self.square_limits.append(divideSingleSquare(data))
                 print("Square limits found", self.square_limits[-1])

@@ -41,7 +41,7 @@ def returnClusterPretrainedCfg():
 
     cfg.pretrained = True
     cfg.train_freq = None
-    cfg.n_parts = 10
+    cfg.n_parts = 0
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------
@@ -78,7 +78,7 @@ def returnClusterUnfamiliarCfg():
 
     cfg.pretrained = False
     cfg.train_freq = 1
-    cfg.n_parts = 10
+    cfg.n_parts = 5
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------

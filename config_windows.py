@@ -40,7 +40,7 @@ from dotmap import DotMap
 import numpy as np
 
 TEMPERATURE_TARGET = 980
-LAYERS = [1, 153]
+LAYERS = [1, 168]
 
 def returnSharedCfg():
     cfg = DotMap()
@@ -51,7 +51,7 @@ def returnSharedCfg():
     cfg.comms.state.rdy_name = 'state_rdy'
     cfg.comms.state.f_name = 'states.npy'
     cfg.env.nS = 16
-    cfg.env.n_parts = 20
+    cfg.env.n_parts = 5
     cfg.env.horizon = LAYERS[1]-LAYERS[0]+1
 
     cfg.save_dir1 = 'saves/'
@@ -59,7 +59,7 @@ def returnSharedCfg():
 
     cfg.parts_ignored = 3
 
-    cfg.env.init_params = [1.125, 110]
+    cfg.env.init_params = [4, 0]
 
     return cfg
 
@@ -74,9 +74,9 @@ def returnMachineCfg():
     cfg.aconity.info.job_name = 'H282Control2'
     cfg.aconity.layers = LAYERS
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
-    cfg.aconity.process.sleep_t = 2.5
+    cfg.aconity.process.sleep_t = 3.5
     cfg.aconity.ignored_parts_speed = 3000
     cfg.aconity.part_delta = 1
-    cfg.aconity.fixed_params = np.ones((10,2))*[1.125, 110]
+    cfg.aconity.fixed_params = np.ones((25,2))*[4, 0]
     cfg.aconity.laser_on = False
     return cfg

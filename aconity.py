@@ -54,6 +54,8 @@ class Aconity:
         self.control_buffer = self.parts_ignored
         self.fixed_buffer = self.control_buffer + shared_cfg.env.n_parts
 
+        self.uploadConfigFiles()
+
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
     # --------------------------------------------------------------------------
@@ -83,6 +85,31 @@ class Aconity:
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
         os.mkdir(dir+cfg.rdy_name) # RDY signal
+
+    def uploadConfigFiles(self):
+        comms = self.m_cfg.comms
+        cfg = self.m_cfg.comms.sftp
+
+        # Set up connection
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
+        sftp = pysftp.Connection(host=cfg.host, username=cfg.user,
+            password=cfg.pwd, cnopts=cnopts)
+
+        # Transfer config files
+        print("Uploading configuration files to %s..." % (comms.cluster_dir))
+        config_files = ['config_cluster.py', 'config_dmbrl.py', 'config_windows.py']
+        for file in config_files: sftp.put(file, comms.cluster_dir+file)
+
+        # Clear local comms
+        cfg = self.s_cfg.comms
+        dir_action = cfg.dir+cfg.action.rdy_name
+        dir_state = cfg.dir+cfg.state.rdy_name
+        if os.path.isdir(dir_action): os.rmdir(dir_action)
+        if os.path.isdir(dir_state): os.rmdir(dir_state)
+
+        sftp.close()
+
 
     # --------------------------------------------------------------------------
     # ACONITY FUNCTIONS
