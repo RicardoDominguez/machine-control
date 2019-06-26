@@ -12,8 +12,8 @@ from .optimizer import Optimizer
 class CEMOptimizer(Optimizer):
     """A Tensorflow-compatible CEM optimizer.
     """
-    def __init__(self, sol_dim, max_iters, popsize, num_elites, tf_session=None,
-                 upper_bound=None, lower_bound=None, epsilon=0.001, alpha=0.25):
+    def __init__(self, sol_dim, max_iters, popsize, num_elites, constrains,
+                tf_session=None, epsilon=0.001, alpha=0.25, max_resamples=10):
         """Creates an instance of this class.
 
         Arguments:
@@ -22,10 +22,10 @@ class CEMOptimizer(Optimizer):
             popsize (int): The number of candidate solutions to be sampled at every iteration
             num_elites (int): The number of top solutions that will be used to obtain the distribution
                 at the next iteration.
+            constrains (np.array): An array with the optimisation constrains = [[lb, ub], [lc1, uc1], [lc2, uc2]]
+                so that if u = [v, q], lb <= u <= ub, lc1 <= q/v <= uc2, lc2 <= q/sqrt(v) <= uc2
             tf_session (tf.Session): (optional) Session to be used for this optimizer. Defaults to None,
                 in which case any functions passed in cannot be tf.Tensor-valued.
-            upper_bound (np.array): An array of upper bounds
-            lower_bound (np.array): An array of lower bounds
             epsilon (float): A minimum variance. If the maximum variance drops below epsilon, optimization is
                 stopped.
             alpha (float): Controls how much of the previous mean and variance is used for the next iteration.
@@ -33,7 +33,8 @@ class CEMOptimizer(Optimizer):
         """
         super().__init__()
         self.sol_dim, self.max_iters, self.popsize, self.num_elites = sol_dim, max_iters, popsize, num_elites
-        self.ub, self.lb = upper_bound, lower_bound
+        self.constrains = constrains
+        self.lb, self.ub = constrains[0][0], constrains[0][1]
         self.epsilon, self.alpha = epsilon, alpha
         self.tf_sess = tf_session
 
@@ -43,19 +44,20 @@ class CEMOptimizer(Optimizer):
         if self.tf_sess is not None:
             with self.tf_sess.graph.as_default():
                 with tf.variable_scope("CEMSolver") as scope:
-                    self.init_mean = tf.placeholder(dtype=tf.float32, shape=[sol_dim])
-                    self.init_var = tf.placeholder(dtype=tf.float32, shape=[sol_dim])
+                    self.init_mean = tf.placeholder(dtype=tf.float32, shape=[sol_dim], name="Init_mean")
+                    self.init_var = tf.placeholder(dtype=tf.float32, shape=[sol_dim], name="Init_var")
 
         self.num_opt_iters, self.mean, self.var = None, None, None
         self.tf_compatible, self.cost_function = None, None
+        self.max_resamples = max_resamples
 
     def changeSolDim(self, sol_dim):
         self.sol_dim = sol_dim
         if self.tf_sess is not None:
             with self.tf_sess.graph.as_default():
                 with tf.variable_scope("CEMSolver") as scope:
-                    self.init_mean = tf.placeholder(dtype=tf.float32, shape=[sol_dim])
-                    self.init_var = tf.placeholder(dtype=tf.float32, shape=[sol_dim])
+                    self.init_mean = tf.placeholder(dtype=tf.float32, shape=[sol_dim], name="Init_mean")
+                    self.init_var = tf.placeholder(dtype=tf.float32, shape=[sol_dim], name="Init_var")
 
     def setup(self, cost_function, tf_compatible):
         """Sets up this optimizer using a given cost function.
@@ -95,9 +97,45 @@ class CEMOptimizer(Optimizer):
                 constrained_var = tf.minimum(tf.minimum(tf.square(lb_dist / 2), tf.square(ub_dist / 2)), var)
                 # constrained_var = tf.Print(constrained_var,[constrained_var], "CS: ", summarize=10)
 
-                # Sample from normal distribution
-                # Shape (popsize, H*nU)
-                samples = tf.truncated_normal([self.popsize, self.sol_dim], mean, tf.sqrt(constrained_var))
+                # Sample from normal distribution, with shape (popsize, H*nU)
+                # Original line: samples = tf.truncated_normal([self.popsize, self.sol_dim], mean, tf.sqrt(constrained_var))
+                def getConstrainViolation(candidates):
+                    # Return true for candidtes which violate the constrains
+                    under_bounds = np.any(candidates <= self.lb, 1)
+                    over_bounds = np.any(candidates >= self.ub, 1)
+                    bounds = np.logical_or(under_bounds, over_bounds)
+
+                    v = candidates[:,0]
+                    q = candidates[:,1]
+
+                    if self.constrains[1] is not None:
+                        q_over_v = q / v
+                        c1 = np.logical_or(q_over_v <= self.constrains[1][0], q_over_v >= self.constrains[1][1])
+                        bounds = np.logical_or(bounds, c1)
+
+                    if self.constrains[2] is not None:
+                        q_over_sqrt_v = q / np.sqrt(v)
+                        c2 = np.logical_or(q_over_sqrt_v <= self.constrains[2][0], q_over_sqrt_v >= self.constrains[2][1])
+                        bounds = np.logical_or(bounds, c2)
+
+                    return bounds
+
+                def sampleCandidates(mu, var):
+                    sigma = np.sqrt(var)
+                    samples = np.random.normal(mu, sigma, [self.popsize, self.sol_dim])
+                    for n in range(self.max_resamples-1):
+                        indx_violation = getConstrainViolation(samples)
+                        n_violations = np.sum(indx_violation)
+                        if n_violations == 0: return samples.astype(np.float32)
+                        samples[indx_violation] = np.random.normal(mu, sigma, [n_violations, self.sol_dim])
+                    indx_violation = getConstrainViolation(samples)
+                    samples[indx_violation] = samples[np.random.choice(np.argwhere(np.logical_not(indx_violation)).reshape(-1),
+                                                        indx_violation.sum())]
+                    return samples.astype(np.float32)
+
+                samples = tf.numpy_function(sampleCandidates, [mean, constrained_var], tf.float32)
+                samples.set_shape(tf.TensorShape([self.popsize, self.sol_dim]))
+
                 # samples = tf.Print(samples,[samples], "Samples: ", summarize=10)
                 # samples = tf.Print(samples,[best_val], "best_val: ", summarize=10)
                 # samples = tf.Print(samples,[best_sol], "best_sol: ", summarize=10)

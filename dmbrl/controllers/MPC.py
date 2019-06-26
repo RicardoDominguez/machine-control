@@ -67,6 +67,10 @@ class MPC(Controller):
                         Note: Must be able to process both NumPy and Tensorflow arrays.
                     .ac_cost_fn (func): A function which computes the cost of every action
                         in a 2D matrix.
+                    .constrains (np.array): An array with the optimisation constrains = [[lb, ub], [lc1, uc1], [lc2, uc2]]
+                        so that if u = [v, q], lb <= u <= ub, lc1 <= q/v <= uc2, lc2 <= q/sqrt(v) <= uc2.
+                        Overwrites ac_lb and ac_ub is constrains[0] is not None.
+                    .max_resamples (int): Maximum number of times the optimiser can resample the candidate solutions.
                 .log_cfg
                     .save_all_models (bool): (optional) If True, saves models at every iteration.
                         Defaults to False (only most recent model is saved).
@@ -79,7 +83,11 @@ class MPC(Controller):
         """
         super().__init__(params)
         self.dO, self.dU = params.dO, params.dU
-        self.ac_ub, self.ac_lb = params.ac_ub, params.ac_lb
+        constrains = get_required_argument(params.opt_cfg, "constrains", "Must provide the optimisation constrains.")
+        self.ac_lb = constrains[0][0]
+        self.ac_ub = constrains[0][1]
+        print("lb", self.ac_lb)
+        print("ub", self.ac_ub)
         self.update_fns = params.get("update_fns", [])
         self.per = params.get("per", 1)
 
@@ -122,8 +130,8 @@ class MPC(Controller):
         opt_cfg = params.opt_cfg.get("cfg", {})
         self.optimizer = MPC.optimizers[params.opt_cfg.mode](
             sol_dim=self.plan_hor*self.dU,
-            lower_bound=np.tile(self.ac_lb, [self.plan_hor]),
-            upper_bound=np.tile(self.ac_ub, [self.plan_hor]),
+            constrains=constrains,
+            max_resamples=params.opt_cfg.get("max_resamples", 10),
             tf_session=None if not self.model.is_tf_model else self.model.sess,
             **opt_cfg
         )

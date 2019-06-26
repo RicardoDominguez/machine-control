@@ -40,7 +40,7 @@ from dotmap import DotMap
 import numpy as np
 
 TEMPERATURE_TARGET = 980
-LAYERS = [1, 168]
+LAYERS = [1, 30]
 
 def returnSharedCfg():
     cfg = DotMap()
@@ -51,7 +51,7 @@ def returnSharedCfg():
     cfg.comms.state.rdy_name = 'state_rdy'
     cfg.comms.state.f_name = 'states.npy'
     cfg.env.nS = 16
-    cfg.env.n_parts = 5
+    cfg.env.n_parts = 7
     cfg.env.horizon = LAYERS[1]-LAYERS[0]+1
 
     cfg.save_dir1 = 'saves/'
@@ -66,17 +66,17 @@ def returnSharedCfg():
 def returnMachineCfg():
     cfg = DotMap()
 
-    cfg.comms.cluster_dir = 'CEM-OPT/'#'machine-control/'
+    cfg.comms.cluster_dir = 'CEM-OPT3/'#'machine-control/'
     cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
     cfg.comms.sftp.user = 'ricardo'
     cfg.comms.sftp.pwd = 'aw%qzv'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring Recalibrated'
-    cfg.aconity.info.job_name = 'H282Control2'
+    cfg.aconity.info.job_name = 'PowerTest'
     cfg.aconity.layers = LAYERS
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
     cfg.aconity.process.sleep_t = 3.5
     cfg.aconity.ignored_parts_speed = 3000
     cfg.aconity.part_delta = 1
-    cfg.aconity.fixed_params = np.ones((25,2))*[4, 0]
+    cfg.aconity.fixed_params = np.ones((0,2))*[4, 0]
     cfg.aconity.laser_on = False
     return cfg

@@ -47,8 +47,9 @@ def returnClusterPretrainedCfg():
     # --------------------------------------------------------------------------
     cfg.ctrl_cfg.per = 1
     cfg.ctrl_cfg.prop_cfg.model_pretrained = True
-    cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
-    cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
+    upper_bounds = [1.8, 140]
+    lower_bounds = [0.57, 75]
+    cfg.ctrl_cfg.opt_cfg.constrains = [[np.array(lower_bounds), np.array(upper_bounds)], [60, 180], [70, 160]]
 
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = True
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = 'dmbrl/trained_models/'
@@ -78,14 +79,15 @@ def returnClusterUnfamiliarCfg():
 
     cfg.pretrained = False
     cfg.train_freq = 1
-    cfg.n_parts = 5
+    cfg.n_parts = 7
     # --------------------------------------------------------------------------
     # CONTROL CONFIGURATION
     # --------------------------------------------------------------------------
     cfg.ctrl_cfg.per = 1
     cfg.ctrl_cfg.prop_cfg.model_pretrained = False
-    cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
-    cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
+    upper_bounds = [1.8, 140]
+    lower_bounds = [0.57, 75]
+    cfg.ctrl_cfg.opt_cfg.constrains = [[np.array(lower_bounds), np.array(upper_bounds)], [60, 180], [70, 160]]
 
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = False
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = ''
