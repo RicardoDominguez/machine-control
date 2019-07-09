@@ -1,7 +1,3 @@
-"""
-Machine side software
-"""
-
 import os
 import numpy as np
 from dotmap import DotMap
@@ -11,10 +7,42 @@ import re
 from process.process_main import *
 
 def pieceNumber(piece_indx, n_ignore):
-    """ 0->4, 1->7, 2->10, etc... """
+    """Returns the index given by AconityStudio to each individual part.
+
+    For instance, if the first part should be ignored, and part numbers increase
+    three by three, then `return int((piece_indx+1)*3+1)` should be used, thus
+    0 -> 4, 1 -> 7, 2 -> 10, etc.
+
+    On the other hand, if the first three parts should be ignored, and part numbers
+    increase one by one, then `return int((piece_indx+3)+1)` should be used, thus
+    0 -> 4, 1 -> 5, 2 -> 6, etc.
+
+    Arguments:
+        piece_indx (int): Input index, starting from 0.
+        n_ignore (int): Number of initial parts that should be ignored.
+
+    Returns:
+        int: Output index as used by AconityStudio.
+    """
     return int((piece_indx+n_ignore)+1)
 
 class Machine:
+    """Reads the raw sensory data outputted by the aconity machine, processes it
+    into a low-dimensional state vector and uploads it a remote server for
+    parameter optimisation.
+
+    Arguments:
+        shared_cfg (dotmap):
+            - **n_ignore** (*int*): Number of additional parts to be built on top of `env.n_parts` (pyrometer may not record data for the first few parts).
+            - **env.nS** (*int*): Dimensionality of the state vector.
+            - **comms** (*dotmap*): Configuration parameters for server communication.
+        machine_cfg (dotmap):
+            - **aconity.layers** (*array of int*): Layer range to be built, as [layer_min, layer_max].
+            - **aconity.open_loop** (*np.array*): Parameters used to build the parts built using fixed parameters, np.array with shape (`n_fixed_parts`, 2).
+            - **aconity.n_parts** (*int*): Number of parts to be built, excluding ignored parts.
+            - **process.sess_dir** (*str*): Folder where pyrometer data is stored by the Aconity machine.
+            - **process.sleep_t** (*float*): Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.
+    """
     def __init__(self, shared_cfg, machine_cfg):
         self.s_cfg = shared_cfg
         self.m_cfg = machine_cfg
@@ -36,7 +64,7 @@ class Machine:
     # --------------------------------------------------------------------------
 
     def _initSFTP(self):
-        """Initialise SFTP connection"""
+        """Initialises a SFTP connection with a remote server."""
         print("Initialising SFTP...")
         cfg = self.m_cfg.comms.sftp
         comms = self.s_cfg.comms
@@ -52,7 +80,7 @@ class Machine:
         print("SFTP initialised")
 
     def getActions(self):
-        """Read action file outputted by cluster"""
+        """Download locally the action file outputted by the remote server."""
         print('Waiting for actions...')
         dir_c = self.m_cfg.comms.cluster_dir + self.s_cfg.comms.dir
         dir_m = self.s_cfg.comms.dir
@@ -71,7 +99,11 @@ class Machine:
         print('Actions saved')
 
     def sendStates(self, states):
-        """Send state information to cluster side"""
+        """Uploads to the the remote server the input state vector.
+
+        Arguments:
+            states (np.array): Processed state vector.
+        """
         dir_c = self.m_cfg.comms.cluster_dir + self.s_cfg.comms.dir
         dir_m = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
@@ -90,8 +122,20 @@ class Machine:
     # PROCESS FUNCTIONS
     # --------------------------------------------------------------------------
     def initProcessing(self):
+        """Obtains the folder in which data will be written by the pyrometer sensor.
+
+        This function automatically detects the latest session and job folders.
+        """
         cfg = self.m_cfg.aconity.process
         def getLatestSession(folder_name):
+            """Returns the name of the most recent session folder within `folder_name`.
+
+            Arguments:
+                folder_name (str): Directory in which to look for session folders.
+
+            Returns:
+                str: Name of most recent session folder.
+            """
             best, name = None, None
             for filename in os.listdir(folder_name):
                 match = re.search(r'session_(\d+)_(\d+)_(\d+)_(\d+)-(\d+)-(\d+).(\d+)', filename)
@@ -103,6 +147,15 @@ class Machine:
                             break
             return name
         def getLatestConfigJobFolder(folder_name, init_str):
+            """Returns the name of the latest config/job folder within `folder_name`.
+
+            Arguments:
+                folder_name (str): Directory in which to look for job/config folders.
+                init_str (str): Folder name must begin with `init_str`.
+
+            Returns:
+                str: Name of most recent config/job folder.
+            """
             latest_n, name = -1, None
             for filename in os.listdir(folder_name):
                 match = re.search(r''+init_str+'_(\d+)_(\w+)', filename)
@@ -118,16 +171,38 @@ class Machine:
         print("Data folder found is " + self.data_folder)
 
     def getFileName(self, layer, piece):
+        """Returns the pyrometer data file path for a given layer and part number.
+
+        This function accounts for the parts being ignored. The layer thickness
+        is 0.03 mm.
+
+        Arguments:
+            layer (int): Layer number.
+            piece (int): Part number.
+
+        Returns:
+            str: File path.
+        """
         return self.data_folder+str(pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
 
     def getStates(self):
-        """Read raw data from the pyrometer and processes it into states"""
+        """Read the raw data outputted from the pyrometer and processes it into
+        low-dimensional state vectors.
+
+        For every part that must be observed, the raw data is red from the file
+        outputted by the Aconity machine, cold lines are removed, the data pertaining
+        to the object manufactured is kept, and it is discretised into a number
+        of discrete regions in which the mean sensor value is computed.
+
+        Returns:
+            np.array: State vectors with shape (`n_parts`,  `nS`)
+        """
         if self.processing_uninitialised:
             rdy = self.s_cfg.comms.dir + self.s_cfg.comms.state.rdy_name
             while(not os.path.isdir(rdy)): pass
             time.sleep(5) # TO MAKE SURE I READ THE CORRECT JOB
             os.rmdir(rdy)
-            self.initProcessing()
+            self.initProcessing() # Get folder where to look for
 
         cfg = self.m_cfg.aconity
         nS = self.s_cfg.env.nS
@@ -156,26 +231,12 @@ class Machine:
         self.curr_layer += 1
         return states
 
-    def sendAction(self, action):
-        dir = self.s_cfg.comms.dir
-        cfg = self.s_cfg.comms.action
-        rdy = dir + cfg.rdy_name
-        np.save(dir+cfg.f_name, action)
-        os.mkdir(rdy) # RDY signal
-        print('Actions saved')
-
-    def test_loop(self):
-        initialised=False
-        while(True):
-            states = self.getStates()
-            if not initialised:
-                state_log = np.empty((0, states.shape[0], states.shape[1]))
-                initialised = True
-            state_log = np.concatenate((state_log, states[None]), axis=0)
-            print("Saving states...")
-            np.save("states.npy", state_log)
-
     def log(self, states):
+        """ Locally saves state information.
+
+        Arguments:
+            states (np.array): State vectors with shape (`n_parts`, `nS`)
+        """
         if self.state_log is None:
             state_log = np.empty((0, states.shape[0], states.shape[1]))
         self.state_log = np.concatenate((self.state_log, states[None]), axis=0)
@@ -183,6 +244,15 @@ class Machine:
 
 
     def loop(self):
+        """ Iteratively obtain next layer's parameters from the remote server,
+        read and process raw pyrometer data, and upload the low-dimensional
+        states to the remote server to compute the next set of optimal parameters.
+
+        Allows the class functionality to be conveniently used as follows::
+
+            machine = Machine(s_cfg, m_cfg)
+            machine.loop()
+        """
         while(True):
             self.getActions()
             states = self.getStates()

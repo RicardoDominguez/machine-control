@@ -182,6 +182,9 @@ class AconitySTUDIO_client:
     ##############################
 
     async def _http_request(self, method, url, log_level='info', headers={}, verbose=False, data=None, timeout = 300):
+        '''
+        Processes an http request.
+        '''
         if method not in ['put','post','get']:
             raise AttributeError('Invalid http request method. Must be put/post/get')
         if 'none' in url or 'None' in url:
@@ -779,6 +782,9 @@ class AconitySTUDIO_client:
         return result
 
     def _channel_paused(self, msg, channel):
+        '''
+        Pauses a channel.
+        '''
         if msg.type == aiohttp.WSMsgType.CLOSED:
             logging.warning('->WS CLOSED')
             return
@@ -802,6 +808,9 @@ class AconitySTUDIO_client:
             raise
 
     def _channel_resumed(self, msg, channel):
+        '''
+        Resumes a channel.
+        '''
         if msg.type == aiohttp.WSMsgType.CLOSED:
             logging.warning('->WS CLOSED')
             return
@@ -825,6 +834,9 @@ class AconitySTUDIO_client:
             raise
 
     def _channel_halted(self, msg, channel):
+        '''
+        Halts a channel.
+        '''
         if msg.type == aiohttp.WSMsgType.CLOSED:
             logging.warning('->WS CLOSED')
             return
@@ -907,7 +919,7 @@ class AconitySTUDIO_client:
         logger.info(f'Subscription to topic {name} sent!')
 
     async def _receive_websocket_data(self):
-        '''todo'''
+        '''Process data received from the websocket'''
         ws_url = self.ws_url + '/connect'
         async with aiohttp.ClientSession(headers=self._headers) as session:
             async with session.ws_connect(ws_url) as self._ws:
@@ -1142,6 +1154,7 @@ class AconitySTUDIO_client:
             return self.job_id
 
     async def _get_job(self, job_id=None):
+        ''' Returns the `JobHandler` object for the current job.'''
         job_id = utils._gather(self, logger, 'job_id', job_id)
         job = await self.get(f'jobs/{job_id}')
         self.job = utils.JobHandler(job, logger, self.studio_version)
@@ -1272,6 +1285,7 @@ class AconitySTUDIO_client:
         raise ValueError('cant check state of config. config with config_id {config_id} can not be found!')
 
     async def get_lasers_off_cmds(self):
+        ''' Returns the command to turn the laser off.'''
         try:
             url = f'machines/{self.machine_id}/functions'
         except AttributeError:

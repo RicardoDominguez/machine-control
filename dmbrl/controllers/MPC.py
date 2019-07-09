@@ -14,69 +14,88 @@ from dmbrl.misc.optimizers import RandomOptimizer, CEMOptimizer
 
 
 class MPC(Controller):
+    """
+    Arguments:
+        params (dotmap): Configuration parameters.
+            .env (gym.env):
+                Environment for which this controller will be used.
+            .update_fns (list<func>):
+                A list of functions that will be invoked (possibly with a
+                tensorflow session) every time this controller is reset.
+            .ac_ub (np.ndarray): (optional)
+                An array of action upper bounds. Defaults to environment action
+                upper bounds.
+            .ac_lb (np.ndarray): (optional)
+                An array of action lower bounds. Defaults to environment action
+                lower bounds.
+            .per (int): (optional)
+                Determines how often the action sequence will be optimized.
+                Defaults to 1 (reoptimizes at every call to act()).
+            .prop_cfg
+                .model_init_cfg (DotMap):
+                    A DotMap of initialization parameters for the model.
+                    .model_constructor (func):
+                        A function which constructs an instance of this model, given model_init_cfg.
+                .model_train_cfg (dict): (optional)
+                    A DotMap of training parameters that will be passed into the
+                    model every time is is trained. Defaults to an empty dict.
+                .model_pretrained (bool): (optional)
+                    If True, assumes that the model has been trained upon construction.
+                .mode (str):
+                    Propagation method. Choose between [E, DS, TSinf, TS1, MM].
+                    See https://arxiv.org/abs/1805.12114 for details.
+                .npart (int):
+                    Number of particles used for DS, TSinf, TS1, and MM propagation methods.
+                .ign_var (bool): (optional)
+                    Determines whether or not variance output of the model will be ignored.
+                    Defaults to False unless deterministic propagation is being used.
+                .obs_preproc (func): (optional)
+                    A function which modifies observations (in a 2D matrix) before
+                    they are passed into the model. Defaults to lambda obs: obs.
+                    Note: Must be able to process both NumPy and Tensorflow arrays.
+                .obs_postproc (func): (optional)
+                    A function which returns vectors calculated from the previous
+                    observations and model predictions, which will then be passed
+                    into the provided cost function on observations. Defaults to
+                    lambda obs, model_out: model_out. Note: Must be able to process
+                    both NumPy and Tensorflow arrays.
+                .obs_postproc2 (func): (optional)
+                    A function which takes the vectors returned by obs_postproc and (possibly)
+                    modifies it into the predicted observations for the next time step.
+                    Defaults to lambda obs: obs. Note: Must be able to process both NumPy and Tensorflow arrays.
+                .targ_proc (func): (optional)
+                    A function which takes current observations and next observations
+                    and returns the array of targets (so that the model learns the mapping
+                    obs -> targ_proc(obs, next_obs)). Defaults to lambda obs, next_obs: next_obs.
+                    Note: Only needs to process NumPy arrays.
+            .opt_cfg
+                .mode (str):
+                    Internal optimizer that will be used. Choose between [CEM, Random].
+                .cfg (DotMap):
+                    A map of optimizer initializer parameters.
+                .plan_hor (int):
+                    The planning horizon that will be used in optimization.
+                .obs_cost_fn (func):
+                    A function which computes the cost of every observation in a 2D matrix.
+                    Note: Must be able to process both NumPy and Tensorflow arrays.
+                .ac_cost_fn (func):
+                    A function which computes the cost of every action in a 2D matrix.
+            .log_cfg
+                .save_all_models (bool): (optional)
+                    If True, saves models at every iteration.
+                    Defaults to False (only most recent model is saved).
+                    Warning: Can be very memory-intensive.
+                .log_traj_preds (bool): (optional)
+                    If True, saves the mean and variance of predicted particle trajectories.
+                    Defaults to False.
+                .log_particles (bool) (optional)
+                    If True, saves all predicted particles trajectories.
+                    Defaults to False. Note: Takes precedence over log_traj_preds.
+                    Warning: Can be very memory-intensive
+    """
     optimizers = {"CEM": CEMOptimizer, "Random": RandomOptimizer}
 
     def __init__(self, params):
-        """Creates class instance.
-
-        Arguments:
-            params
-                .env (gym.env): Environment for which this controller will be used.
-                .update_fns (list<func>): A list of functions that will be invoked
-                    (possibly with a tensorflow session) every time this controller is reset.
-                .ac_ub (np.ndarray): (optional) An array of action upper bounds.
-                    Defaults to environment action upper bounds.
-                .ac_lb (np.ndarray): (optional) An array of action lower bounds.
-                    Defaults to environment action lower bounds.
-                .per (int): (optional) Determines how often the action sequence will be optimized.
-                    Defaults to 1 (reoptimizes at every call to act()).
-                .prop_cfg
-                    .model_init_cfg (DotMap): A DotMap of initialization parameters for the model.
-                        .model_constructor (func): A function which constructs an instance of this
-                            model, given model_init_cfg.
-                    .model_train_cfg (dict): (optional) A DotMap of training parameters that will be passed
-                        into the model every time is is trained. Defaults to an empty dict.
-                    .model_pretrained (bool): (optional) If True, assumes that the model
-                        has been trained upon construction.
-                    .mode (str): Propagation method. Choose between [E, DS, TSinf, TS1, MM].
-                        See https://arxiv.org/abs/1805.12114 for details.
-                    .npart (int): Number of particles used for DS, TSinf, TS1, and MM propagation methods.
-                    .ign_var (bool): (optional) Determines whether or not variance output of the model
-                        will be ignored. Defaults to False unless deterministic propagation is being used.
-                    .obs_preproc (func): (optional) A function which modifies observations (in a 2D matrix)
-                        before they are passed into the model. Defaults to lambda obs: obs.
-                        Note: Must be able to process both NumPy and Tensorflow arrays.
-                    .obs_postproc (func): (optional) A function which returns vectors calculated from
-                        the previous observations and model predictions, which will then be passed into
-                        the provided cost function on observations. Defaults to lambda obs, model_out: model_out.
-                        Note: Must be able to process both NumPy and Tensorflow arrays.
-                    .obs_postproc2 (func): (optional) A function which takes the vectors returned by
-                        obs_postproc and (possibly) modifies it into the predicted observations for the
-                        next time step. Defaults to lambda obs: obs.
-                        Note: Must be able to process both NumPy and Tensorflow arrays.
-                    .targ_proc (func): (optional) A function which takes current observations and next
-                        observations and returns the array of targets (so that the model learns the mapping
-                        obs -> targ_proc(obs, next_obs)). Defaults to lambda obs, next_obs: next_obs.
-                        Note: Only needs to process NumPy arrays.
-                .opt_cfg
-                    .mode (str): Internal optimizer that will be used. Choose between [CEM, Random].
-                    .cfg (DotMap): A map of optimizer initializer parameters.
-                    .plan_hor (int): The planning horizon that will be used in optimization.
-                    .obs_cost_fn (func): A function which computes the cost of every observation
-                        in a 2D matrix.
-                        Note: Must be able to process both NumPy and Tensorflow arrays.
-                    .ac_cost_fn (func): A function which computes the cost of every action
-                        in a 2D matrix.
-                .log_cfg
-                    .save_all_models (bool): (optional) If True, saves models at every iteration.
-                        Defaults to False (only most recent model is saved).
-                        Warning: Can be very memory-intensive.
-                    .log_traj_preds (bool): (optional) If True, saves the mean and variance of predicted
-                        particle trajectories. Defaults to False.
-                    .log_particles (bool) (optional) If True, saves all predicted particles trajectories.
-                        Defaults to False. Note: Takes precedence over log_traj_preds.
-                        Warning: Can be very memory-intensive
-        """
         super().__init__(params)
         self.dO, self.dU = params.dO, params.dU
         self.ac_ub, self.ac_lb = params.ac_ub, params.ac_lb
@@ -172,6 +191,11 @@ class MPC(Controller):
             print("Trajectory prediction logging is disabled.")
 
     def changePlanHor(self, T, freq=None, change_over=False):
+        """Dynamically changes the planning horizon of the MPC algorithm.
+
+        Arguments:
+            T (int): New planning horizon.
+        """
         if not change_over and T >= self.plan_hor: return
 
         dim_diff = self.prev_sol.shape[0] - T*self.dU
@@ -327,9 +351,9 @@ class MPC(Controller):
 
     def _compile_cost(self, ac_seqs, get_pred_trajs=False):
         """
-        Inputs:
-            ac_seqs, sequence of actions with shape (N, H*dU) where N is number
-                     of action sequences to evaluate
+        Arguments:
+            ac_seqs: sequence of actions with shape (N, H*dU)
+            get_pred_trajs (bool): If True, returns the predicted trajectories.
 
         Trajectories are only predicted for logging purposes.
         """
@@ -353,6 +377,7 @@ class MPC(Controller):
         init_obs = tf.tile(self.sy_cur_obs[None], [nopt * self.npart, 1])
 
         def continue_prediction(t, *args): # Just check if t < horizon
+            """Checks if `t` is within the planning horizon"""
             return tf.less(t, self.plan_hor)
 
         if get_pred_trajs:
@@ -360,11 +385,11 @@ class MPC(Controller):
 
             def iteration(t, total_cost, cur_obs, pred_trajs):
                 """
-                Inputs:
-                    t, int
-                    total_cost, (N, particles)
-                    cur_obs,  (N * particles, dO)
-                    pred_trajs, (~, N * particles, dO), at the end (H+1, N*part, dO)
+                Arguments:
+                    t (int)
+                    total_cost (N, particles)
+                    cur_obs (N * particles, dO)
+                    pred_trajs (~, N * particles, dO): Dynamically changes size up to (H+1, N*part, dO)
                 """
                 # Select action, get next predicted state
                 cur_acs = ac_seqs[t] # actions to take at timestep, (N * particles, dU)
@@ -420,9 +445,9 @@ class MPC(Controller):
 
     def _predict_next_obs(self, obs, acs):
         """
-        Inputs
-            obs, (N*particles, nU)
-            acs, (N*particles, nU)
+        Arguments:
+            obs (N*particles, nU)
+            acs (N*particles, nU)
         """
         # Preprocess observation
         proc_obs = self.obs_preproc(obs) # (N*particles, nOP)
@@ -500,8 +525,8 @@ class MPC(Controller):
 
     def _expand_to_ts_format(self, mat): # Expand to trajectory sampling format
         """
-        Inputs
-            mat, shape (N*parts, M)
+        Arguments:
+            mat (N*parts, M)
 
         M can be either the dimension of preprocessed observation or the dimension
         of the action space.
@@ -518,10 +543,11 @@ class MPC(Controller):
 
     def _flatten_to_matrix(self, ts_fmt_arr):
         """
-        Inputs
-            mat, shape (nets, N * particles / nets, nOprediction)
+        Arguments:
+            mat (nets, N * particles / nets, nOprediction)
 
-        Outputs (N * particles, nOprediction)
+        Returns:
+            (N * particles, nOprediction)
         """
         dim = ts_fmt_arr.get_shape()[-1] # nOprediction
         return tf.reshape(

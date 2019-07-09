@@ -8,6 +8,15 @@ import tensorflow as tf
 
 class FC:
     """Represents a fully-connected layer in a network.
+
+    Arguments:
+        output_dim: (int) The dimensionality of the output of this layer.
+        input_dim: (int/None) The dimensionality of the input of this layer.
+        activation: (str/None) The activation function applied on the outputs.
+                                See FC._activations to see the list of allowed strings.
+                                None applies the identity function.
+        weight_decay: (float) The rate of weight decay applied to the weights of this layer.
+        ensemble_size: (int) The number of networks in the ensemble within which this layer will be used.
     """
     _activations = {
         None: tf.identity,
@@ -20,17 +29,6 @@ class FC:
 
     def __init__(self, output_dim, input_dim=None,
                  activation=None, weight_decay=None, ensemble_size=1):
-        """Initializes a fully connected layer.
-
-        Arguments:
-            output_dim: (int) The dimensionality of the output of this layer.
-            input_dim: (int/None) The dimensionality of the input of this layer.
-            activation: (str/None) The activation function applied on the outputs.
-                                    See FC._activations to see the list of allowed strings.
-                                    None applies the identity function.
-            weight_decay: (float) The rate of weight decay applied to the weights of this layer.
-            ensemble_size: (int) The number of networks in the ensemble within which this layer will be used.
-        """
         # Set layer parameters
         self.input_dim = input_dim # The dimensionality of the input of this layer.
         self.output_dim = output_dim # The dimensionality of the output of this layer.
@@ -45,6 +43,7 @@ class FC:
         self.decays = None
 
     def __repr__(self):
+        """Return a formated string with layer parameters"""
         return "FC(output_dim={!r}, input_dim={!r}, activation={!r}, weight_decay={!r}, ensemble_size={!r})"\
             .format(
                 self.output_dim, self.input_dim, self.activation, self.weight_decay, self.ensemble_size
@@ -89,10 +88,8 @@ class FC:
         """Returns a Layer object with the same parameters as this layer.
 
         Arguments:
-            sess: (tf.Session/None) session containing the current values of the variables to be copied.
-                  Must be passed in to copy values.
-            copy_vals: (bool) Indicates whether variable values will be copied over.
-                       Ignored if the variables of this layer has not yet been constructed.
+            sess: (tf.Session/None) session containing the current values of the variables to be copied. Must be passed in to copy values.
+            copy_vals: (bool) Indicates whether variable values will be copied over. Ignored if the variables of this layer has not yet been constructed.
 
         Returns: The copied layer.
         """
@@ -180,8 +177,7 @@ class FC:
         """Returns the current activation function for this layer.
 
         Arguments:
-            as_func: (bool) Determines whether the returned value is the string corresponding
-                     to the activation function or the activation function itself.
+            as_func: (bool) Determines whether the returned value is the string corresponding to the activation function or the activation function itself.
 
         Returns: The activation function (string/function, see as_func argument for details).
         """
@@ -238,9 +234,20 @@ class FC:
             self.decays = []
 
     def set_ensemble_size(self, ensemble_size):
+        """Sets the ensemble size.
+
+        Arguments:
+            ensemble_size (int)
+
+        Returns: None
+        """
         if self.variables_constructed:
             raise RuntimeError("Variables already constructed.")
         self.ensemble_size = ensemble_size
 
     def get_ensemble_size(self):
+        """Returns the ensemble size.
+
+        Returns: int
+        """
         return self.ensemble_size

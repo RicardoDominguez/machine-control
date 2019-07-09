@@ -1,12 +1,25 @@
-"""
-Cluster side software
-"""
-
 import os
 import numpy as np
 from dmbrl.controllers.MPC import MPC
 
 class Cluster:
+    """
+    Computes optimal process parameters, at each layer, given feedback obtained
+    from the machine sensors.
+
+    Arguments:
+        shared_cfg (dotmap):
+            - **env.n_parts** (*int*): Total number of parts built under feedback control.
+            - **env.horizon** (*int*): Markov Decision Process horizon (here number of layers).
+            - **env.nS** (*int*): Dimension of the state vector.
+            - **comms** (*dotmap*): Parameters for communication with other classes.
+        pretrained_cfg (dotmap):
+            - **n_parts** (*dotmap*): Number of parts built under this control scheme.
+            - **ctrl_cfg** (*dotmap*): Configuration parameters passed to the MPC class.
+        learned_cfg (dotmap):
+            - **n_parts** (*dotmap*): Number of parts built under this control scheme.
+            - **ctrl_cfg** (*dotmap*): Configuration parameters passed to the MPC class.
+    """
     def __init__(self, shared_cfg, pretrained_cfg, learned_cfg):
         self.s_cfg = shared_cfg
         self.c_pre_cfg = pretrained_cfg
@@ -22,7 +35,7 @@ class Cluster:
         self.n_parts = shared_cfg.env.n_parts
         self.n_parts_pretrained = pretrained_cfg.n_parts
         self.n_parts_learned = learned_cfg.n_parts
-        assert self.n_parts_pretrained+self.n_parts_learned == self.n_parts
+        assert self.n_parts_pretrained+self.n_parts_learned == self.n_parts, "Number of parts does not match"
 
         self.pret_state_traj = np.zeros((self.n_parts_pretrained, self.H, shared_cfg.env.nS))
         self.pret_action_traj = np.zeros((self.n_parts_pretrained, self.H, 2))
@@ -38,7 +51,15 @@ class Cluster:
     # --------------------------------------------------------------------------
 
     def getStates(self):
-        """Read current system state outputted by machine"""
+        """Load state vectors uploaded to the server by the `Machine` class.
+
+        This function waits for the `comms.dir/comms.state.rdy_name` folder to be
+        created by the `Machine` class, before reading the file where the states
+        are located, `comms.dir/comms.state.f_name`
+
+        Returns:
+            np.array: State vector with shape (`n_parts`, `nS`)
+        """
         print('Waiting for states...')
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
@@ -54,7 +75,14 @@ class Cluster:
         return states
 
     def sendAction(self, actions):
-        """Send computed action to machine side"""
+        """Saves the computed actions.
+
+        Signals the `Machine` class that actions are ready to be downloaded by
+        locally creating the `comms.dir/comms.action.rdy_name` folder
+
+        Arguments:
+            actions (np.array): Action vector with shape (`n_parts`, `nU`)
+        """
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.action
 
@@ -67,7 +95,14 @@ class Cluster:
     # SAMPLE ACTIONS
     # --------------------------------------------------------------------------
     def computeAction(self, states):
-        """Return control action given the current machine state"""
+        """Computes the control actions given the observed system states.
+
+        Arguments:
+            states (np.array): Observed states, shape (`n_parts`, `nS`)
+
+        Returns:
+            np.array: Computed actions, with shape (`n_parts`, `nU`)
+        """
         self.pret_state_traj[:, self.t, :] = states[:self.n_parts_pretrained, :]
         self.lear_state_traj[:, self.t, :] = states[self.n_parts_pretrained:, :]
 
@@ -100,11 +135,21 @@ class Cluster:
         return action
 
     def initAction(self):
-        # Init with 1.125, 110
+        """ Returns the initial action vector.
+
+        This function is required because an initial layer must be built before
+        any feedback is available.
+
+        Returns:
+            np.array: Initial action vector with shape (`n_parts`, `nU`)
+        """
         print("Initial action is 1.125, 110")
         return np.ones((self.s_cfg.env.n_parts, 2)) * [1.125, 110]
 
     def log(self):
+        """ Logs the state and action trajectories, as well as the predicted cost,
+        which may be of interest to tune some algorithmic parameters.
+        """
         for i in range(len(self.save_dirs)):
             np.save(self.save_dirs[i]+"pret_state_traj.npy", self.pret_state_traj)
             np.save(self.save_dirs[i]+"pret_action_traj.npy", self.pret_action_traj)
@@ -114,6 +159,14 @@ class Cluster:
             np.save(self.save_dirs[i]+"lear_pred_cost.npy", self.pred_cost_lear)
 
     def loop(self):
+        """ While within the time horizon, read the states provided by the `Machine`
+        class, and compute and save the corresponding actions.
+
+        Allows the class functionality to be conveniently used as follows::
+
+            cluster = Cluster(s_cfg, cp_cfg, cl_cfg)
+            cluster.loop()
+        """
         self.sendAction(self.initAction())
         while self.t < self.H:
             states = self.getStates()

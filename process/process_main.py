@@ -1,18 +1,4 @@
-"""
-FUNCTIONS IMPLEMENTED:
-    - loadData
-    - purgeData
-    - removeColdLines
-    - divide4squares - provides square_limits when parts are composed of 4 squares
-    - divideDataRectangleLimits - divides data according to square_limits
-    - pieceStateMeans - coarse data into several discrete features
-    - divideDataXY - provides X, Y given sequence of states and valid info
-    - plotTemperaturesState - single square
-    - plotAllStatesFile - all plots for a part within same figure
-    - getInvalidState
-    - isValidState
-"""
-
+"""Implements functions for the processing of raw pyrometer data."""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
@@ -20,7 +6,18 @@ from scipy import signal
 import time
 
 def loadData(file_name, timeit=False, verbose=False):
-    """ Load file, with structure [X, Y, mV, mV] """
+    """Load data from a pyrometer file into a np.array.
+
+    The pyrometer .pcb file has structure [X, Y, mV, mV].
+
+    Arguments:
+        file_name (str): Path to file.
+        timeit (bool, optional): If True, returns the time taken the read the file.
+        verbose (bool, optional): If True, prints to screen additional information.
+
+    Returns:
+        np.array: Data loaded from the .pcb file, with shape (`n`, 3)
+    """
     if timeit:
         print("loadData() function.")
         s = time.time()
@@ -35,65 +32,26 @@ def loadData(file_name, timeit=False, verbose=False):
     if timeit: print("Time elapsed: % d" % (time.time()-s))
     return data
 
-def loadActionFile(file_name, run_one):
-    "returns dictionary where actions['name'] = np.arr[speed, power]"
-    def processFunctionRun1(input):
-        """
-        in = [label_in, speed, power] (floats)
-        out = label_out (str), np.arr[speed, power]
-        """
-        label_in = input[0]
-        if label_in % 2 == 0:
-            return False, 0, 0
-        n = 3*(label_in+1)/2 - 2
-        label_out = str(int(n))
-        data_out = np.array(input[1:])
-        return True, label_out, data_out
-
-    def processFunctionRun2(input):
-        """
-        in = [label_in, speed, power] (floats)
-        out = label_out (str), np.arr[speed, power]
-        """
-        label_in = input[0]
-        if label_in % 2 != 0:
-            return False, 0, 0
-        n = 3*(label_in)/2 - 2
-        label_out = str(int(n))
-        data_out = np.array(input[1:])
-        return True, label_out, data_out
-
-    a = np.loadtxt(file_name)
-
-    actions = {}
-    for i in range(a.shape[0]):
-        if run_one:
-            valid, label, data = processFunctionRun1(a[i,:])
-        else:
-            valid, label, data = processFunctionRun2(a[i,:])
-        if valid: actions[label] = data
-
-    return actions
-
-def purgeData(percent, data):
-    """ Purge "1 - percent" (0 < % < 1) of the data """
-    assert(percent <= 1)
-    assert(percent > 0)
-    n_del = int((1-percent) * data.shape[0])
-    random_index = np.random.choice(data.shape[0], n_del, replace=False)
-    return np.delete(data, random_index, 0)
-
-def removeColdLines(data, returnMode = 0, timeit=False, verbose=False,
+def removeColdLines(data, returnMode=0, timeit=False, verbose=False,
         plot=False, saveName=None, saveDir=None):
-    """
-    The aim of this function is to find the peak in the data around 800mV and
-    remove it. This is done by deleting any data below a value, which we have
-    set as the peak + its width at half height
+    """Removes cold points by deleting all data before the first peak in the
+    pyrometer data frequency distribution (around 800mV).
+
+    This is done by deleting any data bellow the peak + its width at half height.
+
+    Arguments:
+        data (np.array): Raw pyrometer data with shape (`n`, 3).
+        returnMode (int, optional): Determines what parameters will be returned.
+        timeit (bool, optional): If True, returns the time taken to execute the function.
+        verbose (bool, optional): If True, prints to screen additional information.
+        plot (bool, optional): If True, produces a plot of the data distribution and cutoff value.
+        saveName (str, optional): Name of file where the image is to be saved.
+        saveDir (str, optional): Name of directory where the image is to be saved.
 
     Return modes:
-        - 0: returns data above cutoff value
-        - 1: returns cutoff value
-        - 2: returns both data and cutoff value
+        - 0: returns data above cutoff value (np.array).
+        - 1: returns cutoff value (float).
+        - 2: returns both data and cutoff value (np.array, float).
     """
     if timeit:
         print("removeColdLines() function.")
@@ -143,110 +101,14 @@ def removeColdLines(data, returnMode = 0, timeit=False, verbose=False,
     if returnMode == 2:
         return data[Z >= cutoff], cutoff
 
-def divide4squares(data):
-    """ Divides the input data into 4 squares with known dimensions.
-
-    Inputs:
-        data - shape (N, 3)
-
-    Outputs:
-        square_limits - list of length 4, where
-            square_limits[i] = [xmin, xmax, ymin, ymax]
-
-    1. Cut of first/last X% of data, to remove sensor displacement line
-    2. Find min/max of x and y
-    3. Estimate squares using preknown proportions
-
-        dx
-    ---------    ---------
-    --- 0 ---    --- 1 ---  dy
-    ---------    ---------
-
-    ---------    ---------
-    --- 2 ---    --- 3 ---
-    ---------    ---------
-
-    Top of '0' and '1' not perfectly aligned, '0' higher by top_y_diff units
-    Sides of '0' and '2' not perfectly aligned, '2' further to the left by left_x_diff
-    """
-    def bigFlatRegion(arr):
-        largePeak = 10 # Flat regions can only begin with a big peak
-        flatsize = [] # Size of flat
-        flatstart = [] # Start of flat
-
-        if np.abs(arr[0]) > 0:
-            peak = True
-            bigPeak = True
-        else:
-            peak = False
-            flatArea = True
-            starti = 0
-
-        for i in range(1, arr.shape[0]):
-            val = np.abs(arr[i])
-
-            if peak:
-                if val > largePeak:
-                    bigPeak = True
-                elif val == 0:
-                    peak = False
-                    flatArea = bigPeak
-                    starti = i
-            else:
-                if val > 0:
-                    peak = True
-                    bigPeak = val > largePeak
-                    if flatArea:
-                        flatstart.append(starti)
-                        flatsize.append(i-starti-1)
-        if flatArea:
-            flatstart.append(starti)
-            flatsize.append(arr.shape[0]-starti-1)
-
-        return flatstart, flatsize
-
-    # Known proportions (measured with MATLAB, vary slightly among parts)
-    dx = 384 # piece length
-    dy = 414 # piece breadth
-    top_y_diff = 5
-    left_x_diff = 0
-
-    # Remove first and last X% of data
-    leave_out = 0.95
-    nout = int(data.shape[0]*leave_out)
-    maxy = data[-nout:, 1].max()
-
-    # Find minx, maxx
-    leave_out = 0.04
-    nout = int(data.shape[0]*leave_out)
-    data_ = data[nout:-nout, 0]
-    minx, maxx = data_.min(), data_.max()
-
-    # Find miny
-    # --------------------------------------------------------------------------
-    explore_max, N = 0.1, 100
-    nout = int(data.shape[0]*explore_max)
-    dn = int(nout/N)
-    min_window = []
-    inner_min = data[nout:, 1].min()
-    for i in range(N): min_window.append(min(inner_min, data[i*dn:nout, 1].min()))
-    starti, ni = bigFlatRegion(np.diff(min_window))
-    miny = min_window[starti[-1]+1]
-
-    # Apply proportions
-    square_limits = np.array([[minx+left_x_diff, minx+dx+left_x_diff, maxy-dy, maxy],
-                            [maxx-dx, maxx, maxy-dy-top_y_diff, maxy-top_y_diff],
-                            [minx, minx+dx, miny-5, miny+dy],
-                            [maxx-dx, maxx, miny, miny+dy]])
-
-    return square_limits
-
 def divideSingleSquare(data):
-    """ Divides the input data into a single square with known dimension.
+    """ Divides the input data into a single square.
 
-    Inputs: data - shape (N, 3)
+    Arguments:
+        data (np.array): Raw pyrometer data with shape (`n`, 3)
 
-    Outputs: square_limits - shape(4,) as [xmin, xmax, ymin, ymax]
+    Returns:
+        np.array: Square limits as [xmin, xmax, ymin, ymax] with shape (4,)
     """
     # Remove first and last X% of data
     leave_out = 0.15
@@ -259,20 +121,21 @@ def divideSingleSquare(data):
 
 def divideDataRectangleLimits(data, square_limits, returnMode=1,  plot=False,
         saveName=None, saveDir=None):
-    """ Returns a list with the data for each of the pieces
+    """Returns a list with the data for a square given its limits.
 
-    data : nparray (N, 3)
-    square_limits: nparray (4,) [min X, max X, min Y, max Y]
-    plot: bool
-    -------
-    return: nparray (M, 3)
+    Arguments:
+        data (np.array): Raw pyrometer data with shape (`n`, 3)
+        square_limits (np.array): Limits of the square with shape (4,)
+        returnMode (int, optional): Determines what parameters will be returned.
+        plot (bool, optional): If True, produces a plot of the data distribution and cutoff value.
+        saveName (str, optional): Name of file where the image is to be saved.
+        saveDir (str, optional): Name of directory where the image is to be saved.
 
-    Output mode:
-        0 - no return
-        1 - only data within limits
-        2 - data within limits, data outside of limits
-        3 - data within limits, ratio of data outside limits / total data
-        4 - data, ratio, error
+    Output modes:
+        - 1: only data within limits
+        - 2: data within limits, data outside of limits
+        - 3: data within limits, ratio of data outside limits / total data
+        - 4: data, ratio of data deleted, error flag
     """
     # print('Dividing data according to min/max...')
     data_pieces = [] # List of nparrays with data for each piece
@@ -336,23 +199,19 @@ def divideDataRectangleLimits(data, square_limits, returnMode=1,  plot=False,
         return data_pieces[0], delete_ratio, not valid
 
 def pieceStateMeans(piece_data, piece_limits=None, n_splits=None):
-    """
-    Convert the raw data of a single piece into its state by dividing the piece
-    into squares and taking the mean of the temperature within that square.
+    """Convert the raw data of a single piece into a low-dimensional state vector
+    by dividing the piece into regions (squares) and taking the mean of the
+    temperature within that square.
 
-    The number of states will be n_splits * n_splits
+    If a particular square has no data points, then average contiguous states.
 
-    If a particular square has no data points, then average contigous states.
+    Arguments:
+        piece_data (np.array): Part data with shape (`n`, 3)
+        piece_limits (np.array, optional): Limits of the rectangular part as [xmin, xmax, ymin, ymax]
+        n_splits (int, optional): Divided into n_splits*n_splits regions.
 
-    Inputs
-    ------
-        piece_data: nparray, shape(N, 3)
-        piece_limits: nparray, shape(4,) [xmin, xmax, ymin, ymax]
-        n_splits: int
-
-    Output
-    ------
-        states: nparray, shape(n_splits*n_splits,)
+    Returns:
+        np.array: State vector with shape (`n_splits*n_splits`,)
     """
     X, Y, Z = piece_data[:,0], piece_data[:,1], piece_data[:,2]
 
@@ -420,49 +279,16 @@ def pieceStateMeans(piece_data, piece_limits=None, n_splits=None):
 
     return Z_means
 
-def divideDataXY(states, error):
-    """
-    Inputs
-        state - shape (4, N, nS)
-        error - shape (N, ) if nonzero, error in that measurement
-    Outputs
-        X - shape (M*4, nS)
-        Y - shape (M*4, nS)
-    """
-    def XYarray(states, X, Y):
-        """ Assuming no error measurements
-        Input -> state shape(4, N, nS)
-        Output -> X & Y, shape()
-        """
-        X = np.concatenate((X, states[:, :-1, :]), axis=1)
-        Y = np.concatenate((Y, states[:, 1:, :]), axis=1)
-        return X, Y
-    nS = states.shape[-1]
-    X, Y = np.zeros((4, 0, nS)), np.zeros((4, 0, nS))
-    # Index where fault occurred
-    error_indx = np.argwhere(error).reshape(-1)
-    if error_indx.size == 0: # No faults
-        X, Y = XYarray(states, X, Y)
-    else:
-        # Find M
-        X, Y = XYarray(states[:, :error_indx[0], :], X, Y)
-        if error_indx.size > 1:
-            for i in range(error_indx.size-1):
-                X, Y = XYarray(states[:, error_indx[i]+1:error_indx[i+1], :], X, Y)
-        X, Y = XYarray(states[:, error_indx[-1]+1:, :], X, Y)
-    return X.reshape(-1, nS), Y.reshape(-1, nS)
-
-
 def plotTemperaturesState(states, vlimits=None, ax=None, saveFig=None, fig=None, title=None):
-    """
-    Plot the states in a 2D temperature graph
+    """Plots the temperature in each of the regions comprising the low-dimensional states
 
-    Inputs
-    ------
-        states: nparray, shape(nS,)
-        vlimits: None or  nparray, shape(2,) [vmin, vmax]
-        ax: for plotting within a subplot
-        saveFig: filename of figure save
+    Arguments:
+        states (np.array): State vector with shape (`nS`,)
+        vlimits (np.array, optional): Temperature limits as [vmin, vmax]
+        ax (matplotlib.Axes, optional): Produce plot within a subplot environment.
+        saveFig (str, optional): Name of file to save the image.
+        fig (matplotlib.figure.Figure, optional): Figure to which add the plot.
+        title (str, optional): Plot title.
     """
     n_splits = int(np.sqrt(states.size))
     assert(n_splits == np.sqrt(states.size)) # Make sure sqrt is an int
@@ -497,56 +323,3 @@ def plotTemperaturesState(states, vlimits=None, ax=None, saveFig=None, fig=None,
     if saveFig is not None:
         plt.savefig(saveFig)
         plt.close()
-
-def plotAllStatesFile(states, file_name, layer_nums):
-    """Plot all states into a single large image"""
-    N = states.shape[1]
-    pltrow, pltcol = int(np.sqrt(N)), int(np.ceil(np.sqrt(N)))
-    vlimits = [states.min(), states.max()]
-    for sample in range(4):
-        fig, ax = plt.subplots(pltrow, pltcol, figsize=(pltcol*4, pltrow*4))
-        fig.subplots_adjust(hspace=.1, wspace=.1)
-        for row in range(pltrow):
-            for col in range(pltcol):
-                i = row*pltcol + col
-                fig_in = None if i else fig # only show color bar in last picture
-                ax[row,col].xaxis.set_visible(False)
-                ax[row,col].yaxis.set_visible(False)
-                if i < states.shape[1]:
-                    plotTemperaturesState(states[sample, i, :],
-                        vlimits=vlimits, ax=ax[row,col], fig=fig_in)
-                    ax[row,col].set_title(("Sample %d, l = %.2f")%(sample, layer_nums[i]))
-        plt.savefig(file_name+(("s%d.png")%(sample)),
-            bbox_inches='tight', dpi=50)
-        plt.close()
-
-
-def getInvalidState(nS):
-    """
-    When incorrect readings are encountered, nan values will prevent the entire
-    piece from being properly plotted. In this case, assign state values that are
-    characteristic and can be easily recognised.
-
-    i.e. where O is a low value, and - and average one
-    O - - O
-    - - - -
-    - - - -
-    O - - O
-    """
-    lowval, medval = 900, 1050
-    state = np.ones((nS,)) * medval
-    nrow = int(np.sqrt(nS))
-    state[0], state[nrow-1], state[-nrow], state[-1] = lowval, lowval, lowval, lowval
-    return state
-
-def isValidState(states):
-    """
-    Returns an array of bools indicating if the corresponding states are valid
-    or not.
-
-    Inputs: states - shape(N, nS)
-    Outputs: valid - shape(N, nS)
-    """
-    nS = states.shape[-1]
-    invalid_state = getInvalidState(nS)
-    return (states == invalid_state).sum(-1) < nS

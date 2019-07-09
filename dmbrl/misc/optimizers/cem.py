@@ -11,26 +11,21 @@ from .optimizer import Optimizer
 
 class CEMOptimizer(Optimizer):
     """A Tensorflow-compatible CEM optimizer.
+
+    Arguments:
+        sol_dim (int): The dimensionality of the problem space
+        max_iters (int): The maximum number of iterations to perform during optimization
+        popsize (int): The number of candidate solutions to be sampled at every iteration
+        num_elites (int): The number of top solutions that will be used to obtain the distribution at the next iteration.
+        tf_session (tf.Session): (optional) Session to be used for this optimizer. Defaults to None, in which case any functions passed in cannot be tf.Tensor-valued.
+        upper_bound (np.array): An array of upper bounds
+        lower_bound (np.array): An array of lower bounds
+        epsilon (float): A minimum variance. If the maximum variance drops below epsilon, optimization is stopped.
+        alpha (float): Controls how much of the previous mean and variance is used for the next iteration. next_mean = alpha * old_mean + (1 - alpha) * elite_mean, and similarly for variance.
     """
     def __init__(self, sol_dim, max_iters, popsize, num_elites, tf_session=None,
                  upper_bound=None, lower_bound=None, epsilon=0.001, alpha=0.25):
-        """Creates an instance of this class.
 
-        Arguments:
-            sol_dim (int): The dimensionality of the problem space
-            max_iters (int): The maximum number of iterations to perform during optimization
-            popsize (int): The number of candidate solutions to be sampled at every iteration
-            num_elites (int): The number of top solutions that will be used to obtain the distribution
-                at the next iteration.
-            tf_session (tf.Session): (optional) Session to be used for this optimizer. Defaults to None,
-                in which case any functions passed in cannot be tf.Tensor-valued.
-            upper_bound (np.array): An array of upper bounds
-            lower_bound (np.array): An array of lower bounds
-            epsilon (float): A minimum variance. If the maximum variance drops below epsilon, optimization is
-                stopped.
-            alpha (float): Controls how much of the previous mean and variance is used for the next iteration.
-                next_mean = alpha * old_mean + (1 - alpha) * elite_mean, and similarly for variance.
-        """
         super().__init__()
         self.sol_dim, self.max_iters, self.popsize, self.num_elites = sol_dim, max_iters, popsize, num_elites
         self.ub, self.lb = upper_bound, lower_bound
@@ -50,6 +45,11 @@ class CEMOptimizer(Optimizer):
         self.tf_compatible, self.cost_function = None, None
 
     def changeSolDim(self, sol_dim):
+        """Change the dimension of the CEM optimisation solution.
+
+        Arguments:
+            sol_dim (int): New dimension of the CEM optimisation solution.
+        """
         self.sol_dim = sol_dim
         if self.tf_sess is not None:
             with self.tf_sess.graph.as_default():
@@ -81,11 +81,11 @@ class CEMOptimizer(Optimizer):
 
             def iteration(t, mean, var, best_val, best_sol):
                 """
-                Inputs:
-                    mean, shape np(H*nU,)
-                    var, shape np(H*nU,)
-                    best_val, shape (1,)
-                    best_sol, shape (H*nU,)
+                Arguments:
+                    mean (H*nU,)
+                    var (H*nU,)
+                    best_val (1,)
+                    best_sol (H*nU,)
                 """
                 # Adjust variance according to upper and lower bound of actions
                 # mean - lb ~= 2 * sigma, var = sigma^2
@@ -143,6 +143,7 @@ class CEMOptimizer(Optimizer):
                 )
 
     def reset(self):
+        """Blank function for compatibility with optimisation class framework."""
         pass
 
     def obtain_solution(self, init_mean, init_var):

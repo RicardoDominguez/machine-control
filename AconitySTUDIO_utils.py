@@ -89,12 +89,14 @@ def fix_ws_msg(msg, replace_value = - 1):
     return msg
 
 def customTime(*args):
+    ''' Converts time to the local machine timezone.'''
     utc_dt = utc.localize(datetime.datetime.utcnow())
     my_tz = timezone("Europe/Berlin")
     converted = utc_dt.astimezone(my_tz)
     return converted.timetuple()
 
 def filter_out_keys(data, allowed = ['name', 'type', 'value']):
+    ''' Loop through input dictionary and only retain the 'name', 'type', 'value' keys '''
     new = []
     for param in data:
         #loop through dict any only retain 'name', 'type', 'value'
@@ -109,6 +111,7 @@ class JobHandler:
     The user of the Python Client never needs to use this class directly.
     '''
     def __init__(self, job, logger, studio_version):
+        ''' Initialises the class using the input job ID '''
         self.studio_version = studio_version
         self.job = job
         self.logger = logger
@@ -118,6 +121,7 @@ class JobHandler:
         #self.names_global_params = [param['name'] for param in job['params']]
 
     def convert_to_string(self, data=None):
+        '''Convert input data type into a sring.'''
         if data==None:
             data = self.job
         data = data.replace('False','false')
@@ -126,12 +130,15 @@ class JobHandler:
         return data
 
     def set(self, job):
+        ''' Set the internal job variable to the input job '''
         self.job = job
-    
+
     def to_json(self):
+        ''' Convert current job to json '''
         return json.dumps(self.job)
 
     def create_laser_beam_sources(self, lasers):
+        ''' Creates and returns a dictionary containing the laser beam sources '''
         values = ['*'] + [f'scanner_{i}' for i in lasers]
         laser_beam_sources = {
             "index": 0.0,
@@ -146,9 +153,10 @@ class JobHandler:
         return laser_beam_sources
 
     def get_mapping_parts_to_index(self):
+        ''' Returns the indices of the job parts'''
         partRefs = self.job['partRefs']
         non_unique_names = False
-        # simply a list with indices [1,2,3,...]        
+        # simply a list with indices [1,2,3,...]
         self.part_indices = []
         # mapping from part -> subpart -> index. Only != None if all names are unique
         self.part_dictionary = {}
@@ -170,7 +178,7 @@ class JobHandler:
                 for subpart in partRef['subparts']:
                     subpart_index = int(subpart['index'])
                     subpart_name = subpart['name']
-                    
+
                     self.part_indices.append(subpart_index)
 
                     #PART DICT
@@ -184,6 +192,7 @@ class JobHandler:
         return self.part_indices, self.part_dictionary
 
     def get_lasers(self):
+        ''' Returns the available lasers '''
         params = self.job['partRefs'][0]['params']
         for param in params:
             if param['name'] == 'scanner':
@@ -192,9 +201,10 @@ class JobHandler:
                 return lasers, laser_list
 
     def create_addParts(self):
+        ''' Returns the commands to add parts to the job '''
         addParts = 'addParts = function(){'
         partRefs = self.job['partRefs']
-        
+
         self.all_parts = {}
 
         self.part_indices = []
@@ -217,6 +227,7 @@ class JobHandler:
         return addParts
 
     def create_preStartParams(self):
+        ''' Returns the parameters set before the start of the build '''
         preStartParams = 'preStartParams = function(){'
 
         g = f"{self.job['params']}"
@@ -243,15 +254,16 @@ class JobHandler:
                     #subpart_pars = self.convert_to_string(f"{subpart['params']}")
                     idx = int(subpart['index'])
                     preStartParams += f'\n    $p[{idx}].params({subpart_pars})'
-                 
+
         preStartParams += '\n\n}'
-        
+
         #TODO are these necessary? when?
         preStartParams = preStartParams.replace("'",'\"')
         #preStartParams = preStartParams.replace(' ','')
         return preStartParams
 
     def create_preStartSelection(self, layers, parts):
+        ''' Select the parts to be used '''
         if parts == 'all':
             try:
                 self.get_mapping_parts_to_index() #the only purpose of calling this function is to fill the list self.part_indices
@@ -275,6 +287,7 @@ class JobHandler:
         return preStartSelection
 
     def create_init_resume_script(self, layers, parts='all'):
+        ''' Message to resume the execution of a script '''
         init_resume_script = self.create_preStartParams()
         init_resume_script += f'\n'
         init_resume_script += self.create_preStartSelection(layers, parts)
@@ -282,6 +295,7 @@ class JobHandler:
         return init_resume_script
 
     def create_init_script(self, layers, parts='all'):
+        ''' Message to start the execution of a script '''
         init_script = self.create_addParts()
         init_script += f'\n'
         init_script += self.create_preStartParams()
@@ -291,15 +305,16 @@ class JobHandler:
         return init_script
 
     def change_global_parameter(self, param, new_value, check_boundaries=True):
+        ''' Function to change global build parameters '''
         if not check_boundaries:
             self.logger.info('enabling potentially hazardous mode where boundaries are ignored')
-        
+
         global_params = self.job['params']
-        
+
         for i, parameter in enumerate(global_params):
             if parameter['name'] == param:
                 #now we consider the cases of Int/Double Interval and bool
-                self.logger.info(f'before change: {param}={global_params[i]["value"]}')                
+                self.logger.info(f'before change: {param}={global_params[i]["value"]}')
                 if 'Interval' in parameter['type']:
                     if 'intInterval' in parameter['type']:
                         try:
@@ -326,7 +341,7 @@ class JobHandler:
                             new_value = corrected
                             self.logger.warning(msg)
                         elif outside_bounds:
-                            self.logger.info(f'The new value {new_value} of parameter {param} was supposed to lie between inside [{minimum},{maximum}], but since check_boundaries==False, no modification was made')                        
+                            self.logger.info(f'The new value {new_value} of parameter {param} was supposed to lie between inside [{minimum},{maximum}], but since check_boundaries==False, no modification was made')
                         global_params[i]['value']['value'] = new_value
                         global_params[i]['dirty'] = True
                     except TypeError:
@@ -359,7 +374,7 @@ class JobHandler:
                     self.logger.error(msg)
                     raise ValueError(msg)
 
-                self.logger.info(f'trying to set {param}={global_params[i]["value"]}')                
+                self.logger.info(f'trying to set {param}={global_params[i]["value"]}')
                 break
         else:
             self.logger.error(f'parameter {param} is not found in global parameters!'
@@ -367,18 +382,19 @@ class JobHandler:
             raise ValueError
 
     def change_part_parameter(self, part_id, param, new_value, laser = '*', check_boundaries=True):
+        ''' Function to build parameters for individual parts '''
         if not check_boundaries:
             self.logger.info('enabling potentially hazardous mode where boundaries are ignored')
-        
+
         if self.studio_version == 2:
             available_lasers, laser_list = self.get_lasers() # list: ["*", "scanner_1", ... , "scanner_4"]
-            laser = self.laser_dict[laser] #mapping 1->"scanner_1", 2->"scanner_2", etc, "*"->"*" 
+            laser = self.laser_dict[laser] #mapping 1->"scanner_1", 2->"scanner_2", etc, "*"->"*"
             #print('AVAILABLE LASERS', available_lasers)
             if laser not in laser_list:
                 raise ValueError(f'Cant select laser {laser}. choices: {laser_list}')
 
         partRefs = self.job['partRefs']
-        
+
         for partRef in partRefs: #main parts
             for subpart in partRef['subparts']: #sub parts
                 if int(subpart['index']) == int(part_id): #we found our part
@@ -412,12 +428,12 @@ class JobHandler:
                                 except:
                                     self.logger.exception(f'parameter {param}({new_value}) is not type double/float.')
                                     raise
-                            
+
                             self.logger.info(f'param {param} before change: {partRef["name"]}, {subpart["name"]}, {subpart["params"][i]["value"]["value"]}')
                             try:
                                 minimum = subpart['params'][i]['value']['min']
                                 maximum = subpart['params'][i]['value']['max']
-                                
+
                                 outside_bounds = new_value < minimum or new_value > maximum
                                 if check_boundaries and outside_bounds:
                                         correction = min(max(minimum, new_value), maximum)
@@ -428,7 +444,7 @@ class JobHandler:
                                         self.logger.warning(msg)
                                 elif outside_bounds:
                                         self.logger.info(f'The new value {new_value} of parameter {param} was supposed to lie between inside [{minimum},{maximum}], but since check_boundaries==False, no modification was made')
-                
+
                                 subpart['params'][i]['value']['value'] = new_value
                                 subpart['params'][i]['dirty'] = True
                                 self.logger.info(f'trying to set: {partRef["name"]}, {subpart["name"]}, {subpart["params"][i]["value"]["value"]}')
@@ -437,9 +453,9 @@ class JobHandler:
                                 subpart['params'][i]['dirty'] = True
                                 self.logger.warning(f'parameter {param} has no min and max values defined.')
                                 self.logger.info(f'trying to set  {partRef["name"]}, {subpart["name"]}, {subpart["params"][i]["value"]}')
-                                
-                            
-                            
+
+
+
                             # COLOR
                             #subpart['params'][i]['color'] = "#0000ff" #cyan -> python client shall not be bothered with colors.
                             # SYNC -> ignore subpart['params'][i]['sync'] completely. It is not used anywhere anymore.
@@ -480,6 +496,7 @@ class JobHandler:
         raise ValueError(f'part id {part_id} does not exist')
 
 def get_adress(args):
+    ''' Return the address of the machine '''
     if len(args) > 1:
         machine = args[1]
         if machine in ADRESS:
@@ -491,6 +508,7 @@ def get_adress(args):
     return adress
 
 def _gather(self, logger, attribute, value):
+    ''' Return attributes from the class object '''
     if value == None:
         if getattr(self, attribute) != None:
             value = getattr(self, attribute)
@@ -500,6 +518,7 @@ def _gather(self, logger, attribute, value):
     return value
 
 def log_setup(filename, directory_path = ''):
+    ''' Initialise the logging functionality '''
     t = customTime()
     now = str(t.tm_year) + '-' + str(t.tm_mon) + '-'  + str(t.tm_mday) + \
         '_' + str(t.tm_hour) + '-' + str(t.tm_min)
@@ -509,7 +528,7 @@ def log_setup(filename, directory_path = ''):
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(logging.INFO)
     handlers = [file_handler, stdout_handler]
-    
+
     logging.Formatter.converter = customTime
 
     Format = "[%(asctime)s - %(funcName)15s()] %(levelname)s %(message)s"
@@ -526,6 +545,7 @@ def log_setup(filename, directory_path = ''):
 
 
 def get_time_string(raw_time_stamp, format ='%b %d %H:%M:%S'):
+    ''' Return a string with the current time '''
     time_string = ''
     try:
         unix_time = int(float(raw_time_stamp) / 1000)
@@ -539,16 +559,17 @@ def get_time_string(raw_time_stamp, format ='%b %d %H:%M:%S'):
 
 
 def track_layer_number(client, msg):
-        if 'topic' in msg and msg['topic'] == 'cmds' and 'data' in msg:
-            for data in msg['data']:
-                if 'name' in data and 'value' in data and data['name'] == 'report':
-                    value = json.loads(data['value'])
-                    if 'counts' in value and 'AddLayerCommand' in value['counts']:
-                        client.current_layer = value['counts']['AddLayerCommand']
-                    client.value = value
-                    print('track_layer_number:', value)
+    ''' Update the current layer class attribute '''
+    if 'topic' in msg and msg['topic'] == 'cmds' and 'data' in msg:
+        for data in msg['data']:
+            if 'name' in data and 'value' in data and data['name'] == 'report':
+                value = json.loads(data['value'])
+                if 'counts' in value and 'AddLayerCommand' in value['counts']:
+                    client.current_layer = value['counts']['AddLayerCommand']
+                client.value = value
+                print('track_layer_number:', value)
 
-            client.current_layer = 5
+        client.current_layer = 5
 
 '''
 class Decorators:

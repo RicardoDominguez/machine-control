@@ -9,20 +9,20 @@ from .optimizer import Optimizer
 
 
 class RandomOptimizer(Optimizer):
+    """Random shooting optimisation.
+
+    Arguments:
+        sol_dim (int): The dimensionality of the problem space
+        popsize (int): The number of candidate solutions to be sampled at every iteration
+        num_elites (int): The number of top solutions that will be used to obtain the distribution
+            at the next iteration.
+        tf_session (tf.Session): (optional) Session to be used for this optimizer. Defaults to None,
+            in which case any functions passed in cannot be tf.Tensor-valued.
+        upper_bound (np.array): An array of upper bounds
+        lower_bound (np.array): An array of lower bounds
+    """
     def __init__(self, sol_dim, popsize, tf_session,
                  upper_bound=None, lower_bound=None):
-        """Creates an instance of this class.
-
-        Arguments:
-            sol_dim (int): The dimensionality of the problem space
-            popsize (int): The number of candidate solutions to be sampled at every iteration
-            num_elites (int): The number of top solutions that will be used to obtain the distribution
-                at the next iteration.
-            tf_session (tf.Session): (optional) Session to be used for this optimizer. Defaults to None,
-                in which case any functions passed in cannot be tf.Tensor-valued.
-            upper_bound (np.array): An array of upper bounds
-            lower_bound (np.array): An array of lower bounds
-        """
         super().__init__()
         self.sol_dim = sol_dim
         self.popsize = popsize

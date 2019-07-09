@@ -4,9 +4,8 @@ from __future__ import absolute_import
 
 
 class Controller:
+    """Framework of a controller class"""
     def __init__(self, *args, **kwargs):
-        """Creates class instance.
-        """
         pass
 
     def train(self, obs_trajs, acs_trajs, rews_trajs):

@@ -57,16 +57,16 @@ class Aconity:
 
     Arguments:
         shared_cfg (dotmap):
-                - env.n_parts (int): Number of parts to be built, not including the first `n_ignore` parts, which are often no recorded by the pyrometer.
-                - n_ignore (int): Number of parts built in addition to `n_parts`. Typicall, the first 3 parts are not fully recorded by the pyrometer.
-                - ctrl_cfg.ac_lb (array of floats): Lower bounds of the build parameter ([speed (m/s), power (W)])
-                - ctrl_cfg.ac_ub (array of floats): Upper bounds of the build parameters ([speed (m/s), power (W)])
-                - comms (dotmap): Parameters for communication with other classes.
+            - **env.n_parts** (*int*): Number of parts to be built, not including the first `n_ignore` parts, which are often no recorded by the pyrometer.
+            - **n_ignore** (*int*): Number of parts built in addition to `n_parts`. Typically, the first 3 parts are not fully recorded by the pyrometer.
+            - **ctrl_cfg.ac_lb** (*array of floats*): Lower bounds of the build parameter in the form [speed (m/s), power (W)].
+            - **ctrl_cfg.ac_ub** (*array of floats*): Upper bounds of the build parameters in the form [speed (m/s), power (W)].
+            - **comms** (*dotmap*): Parameters for communication with other classes.
         aconity_cfg (dotmap):
-                - config_name (str): Configuration name, for example `Unheated 3D Monitoring`
-                - job_name (str): Job name as displayed in the AconitySTUDIO web application.
-                - layers (array of int): Start and end layer for the build ([start_layer, end_layer])
-                - **fixed_parameters** (*np.array*) - Parameters for parts build with fixed parameters
+            - **config_name** (*str*): Configuration name, i.e. `Unheated 3D Monitoring`.
+            - **job_name** (*str*): Job name as displayed in the AconitySTUDIO web application.
+            - **layers** (*array of int*): Start and end layers for the build in the form [start_layer, end_layer].
+            - **fixed_parameters** (*np.array, shape N x 2*): Parameters used for parts built with fixed parameters.
     """
     def __init__(self, shared_cfg, aconity_cfg):
         self.s_cfg = shared_cfg
@@ -92,12 +92,11 @@ class Aconity:
     # COMMS FUNCTIONS
     # --------------------------------------------------------------------------
     async def getActions(self):
-        """Gets the parameters obtained using closed-loop control
+        """Gets the parameters generated using closed-loop control, copied locally
+        from the remote server by the `Machine` class.
 
-        Returns
-        -------
-        actions : np.array
-            Shape (n. parts under closed-loop control, n. control parameters)
+        Returns:
+            np.array: Parameters generated using closed-loop control, with shape (`parts under closed-loop control`, 2)
         """
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.action
@@ -120,7 +119,12 @@ class Aconity:
         return actions
 
     def signalJobStarted(self):
-        """Signal that the job has been stated"""
+        """Signals the `Machine` class that the job has been stated.
+
+        This is done by creating a folder locally in `comms.dir/comms.state.rdy_name`.
+
+        This prompts the `Machine` class to read and analyse the pyrometer data.
+        """
         dir = self.s_cfg.comms.dir
         cfg = self.s_cfg.comms.state
         os.mkdir(dir+cfg.rdy_name) # RDY signal
@@ -130,7 +134,10 @@ class Aconity:
     # --------------------------------------------------------------------------
 
     async def initAconity(self):
-        """Initialise the Aconity machine"""
+        """Creates a new connection to the AconityMINI using the job name provided.
+
+        The latest session created by the AconityStudio web application is used.
+        """
         self.client = await AconitySTUDIOPythonClient.create(getLoginData())
         await self.client.get_job_id(self.a_cfg.job_name)
         await self.client.get_machine_id('AconityMini')
@@ -139,7 +146,11 @@ class Aconity:
         print("The Aconity machine has been initialised")
 
     async def initialParameterSettings(self):
-        """Initialise the parameters for the parts with fixed parameters"""
+        """Sets the build parameters for those parts which use fixed parameters throughout the build.
+
+        This parameters are defined in the configuration files rather than being
+        passed an input to this function.
+        """
         # Slowly scan the parts being ignored
         for i in range(self.n_ignore):
             await self.client.change_part_parameter(i+1, 'mark_speed', 3000)
@@ -150,22 +161,54 @@ class Aconity:
             await self.client.change_part_parameter(pieceNumber(i, self.fixed_params_buffer), 'mark_speed', open_loop[i,0]*1000)
             await self.client.change_part_parameter(pieceNumber(i, self.fixed_params_buffer), 'laser_power', open_loop[i,1])
 
-    def _pieceNumber(self):
-        """ piece_indx, n_ignore """
-        """ 0->4, 1->7, 2->10, etc... """
-        """ 0->2, 1->3, 2->4, etc..."""
-        #return int((piece_indx+n_ignore)*3+1)
+    def _pieceNumber(self, piece_indx, n_ignore):
+        """Returns the index given by AconityStudio to each individual part.
+
+        For instance, if the first part should be ignored, and part numbers increase
+        three by three, then `return int((piece_indx+1)*3+1)` should be used, thus
+        0 -> 4, 1 -> 7, 2 -> 10, etc.
+
+        On the other hand, if the first three parts should be ignored, and part numbers
+        increase one by one, then `return int((piece_indx+3)+1)` should be used, thus
+        0 -> 4, 1 -> 5, 2 -> 6, etc.
+
+        Arguments:
+            piece_indx (int): Input index, starting from 0.
+            n_ignore (int): Number of initial parts that should be ignored.
+
+        Returns:
+            int: Output index as used by AconityStudio.
+        """
         return int((piece_indx+n_ignore)+1)
 
     async def _changeMarkSpeed(self, part, value):
+        """Changes the mark speed of an individual part.
+
+        Arguments:
+            part (int): Index of part (from 0 to n_parts).
+            value (float): Value to be assigned as the mark speed.
+        """
         print("Writing speed to %d " % (pieceNumber(part, self.control_buffer)))
         await self.client.change_part_parameter(pieceNumber(part, self.control_buffer), 'mark_speed', value)
 
     async def _changeLaserPower(self, part, value):
+        """Changes the laser power of an individual part.
+
+        Arguments:
+            part (int): Index of part (from 0 to n_parts).
+            value (float): Value to be assigned as the laser power.
+        """
         await self.client.change_part_parameter(pieceNumber(part, self.control_buffer), 'laser_power', value)
 
     async def _pauseUponLayerCompletion(self, sleep_time=0.05):
-        """ sleep time in seconds """
+        """Awaits the current layer to be complete and then pauses the build.
+
+        Layer completion is checked by pooling `client.job_info['AddLayerCommands']`,
+        which increases by one upon the completion of a layer.
+
+        Arguments:
+            sleep_time (float, optional): Period with which the status of the build is checked, in seconds.
+        """
         print("Awaiting for layer completion...")
         original = self.client.job_info['AddLayerCommands']
         while(original==self.client.job_info['AddLayerCommands']):
@@ -175,7 +218,14 @@ class Aconity:
         self.job_paused = True
 
     async def performLayer(self, actions):
-        """Start building next layer with the specified parameters"""
+        """Builds a single layer using the specified input parameters.
+
+        Before the layer is started, the relevant parameters are changed according
+        to the input array `actions`. Upon the completion of the layer, the build is paused.
+
+        Arguments:
+            actions (np.array): Input parameters to be used for the new layer, with shape (`n_parts`, 2)
+        """
         print("Actions chosen", actions)
         cfg = self.a_cfg.aconity
         assert cfg.n_parts == actions.shape[0], \
@@ -194,13 +244,13 @@ class Aconity:
             await self._changeMarkSpeed(part, actions[part, 0]*1000)
             await self._changeLaserPower(part, actions[part, 1])
 
-        # Resume / start job
+        # Resume / start job as appropiate
         if self.job_started:
             print("Wait for job to be paused")
             while(not self.job_paused): pass
             await self.client.resume_job(layers=cfg.layers)
             self.job_paused = False
-        else:
+        else: # First time performLayer() is called, this is executed
             execution_script = getgetExecutionScript()
             await self.client.start_job(cfg.layers, execution_script)
             await self.initialParameterSettings()
@@ -216,8 +266,21 @@ class Aconity:
         self.curr_layer += 1
 
     async def loop(self):
+        """ While the build is unfinished, iteratively builds layers using the
+        provided build parameters.
+
+        The `initAconity()` function must always be called before this function.
+        Iterates between reading the build parameters outputted in real-time by
+        the cluster, and using these build parameters to build individual layers.
+
+        Allows the class functionality to be conveniently used as follows::
+
+            aconity = Aconity(s_cfg, a_cfg)
+            aconity.initAconity()
+            aconity.loop()
+        """
         max_layer = self.a_cfg.aconity.layers[1]
         while self.curr_layer <= max_layer:
             print("Layer %d/%d" % (self.curr_layer, max_layer))
             actions = await self.getActions()
-            await self.performLayer(actions)
+            await self.performLayer(actions) # Build layer

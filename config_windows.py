@@ -1,47 +1,45 @@
-"""
-shared config parameters
-------------------------
-    |- comms
-        |- dir          - directory where files will be written
-        |- action
-            |- rdy_name - name of file created to signal data has been written
-            |- f_name   - name of file containing .npy data
-        |- state
-            |- dir      - directory where files will be written before being sent
-            |- rdy_name - name of file uploaded to signal end of data upload
-            |- f_name   - name of file containing .npy data
-    |- env
-        |- nS           - number of states
-        |- n_parts
-        |- horizon
-
-machine config parameters
-------------------------
-    |- comms
-        |- cluster_dir   - directory in which machine-control/ is located on the cluster
-        |- sftp          - sftp config
-            |- host
-            |- user
-            |- pwd
-    |- aconity
-        |- info
-            |- config_name
-            |- job_name
-        |- layers       - [start, end]
-        |- n_parts
-        |- process
-            |- sess_dir - folder where data is logged
-            |- sleep_t  - after detecting file and before reading it
-            |- debug_dir- save information useful for debuging
-        |- open_loop    - settings for open loop parts
-"""
+""" Defines the configuration parameters used by the `Aconity`, `Machine` and `Cluster` classes. """
 from dotmap import DotMap
 import numpy as np
 
-def get_n_parts(): return 20
-def get_layers(): return [1, 153]
+def get_n_parts():
+    """Returns the number of parts to be built.
+
+    This excludes the parts being ignored (cfg.n_ignore)
+
+    Returns:
+        int: Number of parts to be built.
+    """
+    return 20
+
+def get_layers():
+    """Returns the layer range to be built, as [layer_min, layer_max]
+
+    Returns:
+        array of ints: Layer range to build.
+    """
+    return [1, 153]
 
 def returnSharedCfg():
+    """Return shared configuration parameters.
+        - comms: Configuration parameters for server communication.
+            - dir: Directory where files and folders will be written.
+            - action
+                - rdy_name: Name of folder created to signal action data has been written.
+                - f_name: Name of .npy file containing the actions computed.
+            - state
+                - rdy_name: Name of folder created to signal state data has been uploaded.
+                - f_name: Name of .npy file containing the state vectors processed.
+        - env
+            - nS: Dimensionality of the state vector.
+            - n_parts: Number of parts to be built (not regarding ignored parts).
+            - horizon: MDP event horizon (number of timesteps = number of layers).
+        - n_ignore: Number of additional parts to be built on top of `env.n_parts` (pyrometer may not record data for the first few parts).
+        - n_rand: Number of parts to be built with random parameters.
+        - ctrl_cfg
+            - ac_ub: Upper bounds of the build parameter in the form [speed (m/s), power (W)].
+            - ac_lb: Lower bounds of the build parameter in the form [speed (m/s), power (W)].
+    """
     cfg = DotMap()
 
     cfg.comms.dir = 'io/'
@@ -55,27 +53,42 @@ def returnSharedCfg():
     cfg.env.horizon = layers[1]-layers[0]+1
 
     cfg.save_dir1 = 'saves/'
-    cfg.save_dir2 = ''#'/home/ricardo/'
+    cfg.save_dir2 = ''
 
     cfg.n_ignore = 3
     cfg.n_rand = 0
 
     cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
-    cfg.ctrl_cfg.ac_lb = np.array([0.57, 75])
+    cfg.ctrl_cfg.ac_ub = np.array([0.57, 75])
 
     return cfg
 
 def returnMachineCfg():
+    """ Return configuration parameters for the `Machine` class.
+        - comms: Configuration parameters for server communication.
+            - cluster_dir: Location of the code within the remote server.
+            - sftp: Configuration parameters for SFTP communication.
+                - host: Address of the remote server, i.e. scentrohpc.shef.ac.uk
+                - user: User name (login credentials).
+                - pwd: Password (login credentials).
+        - aconity: Machine parameters for the use of the Aconity API.
+            - info
+                - config_name: Configuration name, i.e. `Unheated 3D Monitoring`.
+                - job_name: Job name as displayed in the AconitySTUDIO web application.
+            - layers: Layer range to be built, as [layer_min, layer_max]
+            - n_parts: Number of parts to be built, excluding ignored parts.
+            - process: Configuration parameters for processing sensory data.
+                - sess_dir: Folder where pyrometer data is stored by the Aconity machine.
+                - sleep_t: Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.
+                - debug_dir: Folder where to save information useful for debugging.
+            - open_loop: Parameters used to build the parts built using fixed parameters, np.array with shape (`n_fixed_parts`, 2).
+    """
     cfg = DotMap()
 
     cfg.comms.cluster_dir = 'machine-control/'
     cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
     cfg.comms.sftp.user = 'ricardo'
     cfg.comms.sftp.pwd = 'aw%qzv'
-    # cfg.comms.cluster_dir = '/data/coa16r/machine-control/'
-    # cfg.comms.sftp.host = 'sharc.shef.ac.uk'
-    # cfg.comms.sftp.user = 'coa16r'
-    # cfg.comms.sftp.pwd = 'Pazz2314'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring Recalibrated'
     cfg.aconity.info.job_name = 'H282Control2'
     cfg.aconity.layers = get_layers()

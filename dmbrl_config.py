@@ -1,3 +1,12 @@
+""" Low level configuration for modeling and optimisation.
+
+Global variables:
+    - MODEL_IN (int): Number of inputs to the model.
+    - MODEL_OUT (int): Number of outputs of the model.
+    - HOLDOUT_RATIO (float): Percentage of training data used for checking model performance.
+    - CEM_ALPHA (float): Alpha parameter of the CEM optimisation algorithm.
+    - CEM_EPS (float): Epsilon parameter of the CEM optimisation algorithm.
+"""
 from dotmap import DotMap
 import numpy as np
 import tensorflow as tf
@@ -5,22 +14,39 @@ from dmbrl.modeling.models import BNN
 from dmbrl.modeling.layers import FC
 from dmbrl.misc.DotmapUtils import get_required_argument
 
-# Controller parameters
-# ------------------------------------------------------------------------------
-CEM_ALPHA = 0.1
-CEM_EPS = 0.001
-
 # Model parameters
 # ------------------------------------------------------------------------------
 MODEL_IN, MODEL_OUT = 18, 16
 HOLDOUT_RATIO = 0.0
 
+
+# Controller parameters
+# ------------------------------------------------------------------------------
+CEM_ALPHA = 0.1
+CEM_EPS = 0.001
+
+
 # Model constructor
 # ------------------------------------------------------------------------------
 def bnn_constructor(model_init_cfg):
+    """ Constructs the Bayesian Neural Network model.
+
+    Moodel_init_cfg is a dotmap object containing:
+        - model_in (int): Number of inputs to the model.
+        - model_out (int): Number of outputs to the model.
+        - n_layers (int): Number of hidden layers.
+        - n_neurons (int): Number of neurons per hidden layer.
+        - learning_rate (float): Learning rate.
+        - wd_in (float): Weight decay for the input layer neurons.
+        - wd_hid (float): Weight decay for the hidden layer neurons.
+        - wd_out (float): Weight decay for the output layer neurons.
+
+    Returns:
+        BNN class object
+    """
     cfg = tf.ConfigProto()
     cfg.gpu_options.allow_growth = True
-    SESS = tf.Session(config=cfg)
+    SESS = tf.Session(config=cfg) # Tensorflow session
     model = BNN(DotMap(
         name=get_required_argument(model_init_cfg, "model_name",
             "Must provide model name size"),
@@ -43,17 +69,54 @@ def bnn_constructor(model_init_cfg):
 # Preprocessing and postprocessing functions
 # ------------------------------------------------------------------------------
 def obs_preproc(obs):
-    return obs
+    """Modifies observations (in a 2D matrix) before they are passed into the model.
+
+    Arguments:
+        obs (np.array or tf.Tensor): Array of observations with shape (`n`, `dO`).
+
+    Returns:
+        np.array or tf.Tensor with shape (`n`, `model_in`)
+    """
+    return obs # Not modified
 
 def obs_postproc(obs, pred):
+    """Modifies observations and model predictions before being passed to cost function.
+
+    Arguments:
+        obs (np.array or tf.Tensor): Array of observations with shape (`n`, `dO`).
+        pred (np.array or tf.Tensor): Array of predictions (model outputs) with shape (`n`, `model_output`).
+
+    Returns:
+        np.array or tf.Tensor with shape (`n`, `dO`)
+    """
     return obs + pred
 
 def targ_proc(obs, next_obs):
+    """Takes current observations and next observations and returns the array of
+    targets (so that the model learns the mapping obs -> targ_proc(obs, next_obs))
+
+    Arguments:
+        obs (np.array or tf.Tensor): Array of observations at time `t` with shape (`n`, `dO`).
+        next_obs (np.array or tf.Tensor): Array of observations at time `t+1` with shape (`n`, `dO`).
+
+    Returns:
+        np.array or tf.Tensor with shape (`n`, `model_out`)
+    """
     return next_obs - obs
 
 # Cost functions
 # ------------------------------------------------------------------------------
 def obs_cost_fn(obs):
+    """ Cost function (state-dependent) used in the optimisation problem.
+
+    Should process both np.arrays and tf.Tensor inputs.
+
+    Arguments:
+        obs (np.array or tf.Tensor): Array of observations with shape (`n`, `dO`).
+
+    Returns:
+        float
+    """
     target = 980
     k = 1000
     if isinstance(obs, np.ndarray):
@@ -62,12 +125,24 @@ def obs_cost_fn(obs):
         return -tf.exp(-tf.reduce_sum(tf.square((obs-target)), axis=-1)/k)
 
 def ac_cost_fn(acs):
+    """ Cost function (action-dependent) used in the optimisation problem.
+
+    Should process both np.arrays and tf.Tensor inputs.
+
+    Arguments:
+        acs (np.array or tf.Tensor): Array of actions with shape (`n`, `dU`).
+
+    Returns:
+        float
+    """
     return 0 # No constrains on actuators
 
 # ------------------------------------------------------------------------------
 # FUNCTION TO BE IMPORTED
 # ------------------------------------------------------------------------------
 def create_dmbrl_config():
+    """Returns the low-level modeling and optimisation configuration parameters."""
+
     cfg = DotMap()
 
     cfg.ctrl_cfg.dO = 16
