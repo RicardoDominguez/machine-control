@@ -1,0 +1,8 @@
+re==2.2.1
+numpy==1.13.1
+dotmap==1.3.8
+pysftp==0.2.9
+asyncio==3.4.3
+aiohttp==3.5.4
+websockets==7.0
+pymongo==3.8.0

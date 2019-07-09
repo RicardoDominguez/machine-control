@@ -14,7 +14,7 @@ from pytz import timezone, utc
 import logging
 logger = logging.getLogger(__package__)
 
-from AconitySTUDIO_client import utils
+import AconitySTUDIO_utils
 
 class AconitySTUDIO_client:
     '''
@@ -64,7 +64,7 @@ class AconitySTUDIO_client:
         # job management
         self.time_out_script_routes = 5
         self.savety_sleep = 0.15
-        
+
         logger.info(f'rest url: {self.rest_url}')
 
     def __str__(self):
@@ -78,7 +78,7 @@ class AconitySTUDIO_client:
 
         infos = ['machine_name', 'machine_id', 'config_name', 'config_id', 'job_name', 'job_id',
                  'workunit_id', 'session_id']
-    
+
         for info in infos:
             information = getattr(self, info, 'Not available')
             myself += f'\n\t\t\t\t{info}: {information}'
@@ -90,7 +90,7 @@ class AconitySTUDIO_client:
 
     @classmethod
     async def create(cls, login_data):
-        ''' 
+        '''
         Factory class method to initialize a client.
         Convenient as this function takes care of logging in and creating a websocket connection.
         It will also set set up a ping, to ensure the connection will not be lost.
@@ -112,7 +112,7 @@ class AconitySTUDIO_client:
 
         self = AconitySTUDIO_client(login_data)
         await self._login()
-        
+
         self.ws_processing_task = asyncio.create_task(self._receive_websocket_data())
         asyncio.create_task(self._ping(self.time_between_pings))
         asyncio.create_task(self._track_AddLayerCommand())
@@ -120,23 +120,23 @@ class AconitySTUDIO_client:
 
         logger.info('created client')
         return self
-   
+
     async def _ping(self, time=5):
-        '''  
+        '''
         If no ping is sent, the connection will be lost after some time.
         The user does not need to call this, as the login() function takes care of this.
 
         :param time: time between pings
         :type time: double
-        ''' 
+        '''
         while True:
             await asyncio.sleep(time)
             await self.get('ping', log_level='debug')
- 
+
     async def _connect(self):
         '''
         Connects to the Websocket
-        
+
         This function needs the Credentials created during login.
 
         The user does not need to call it, see the Factory method `create`.
@@ -159,7 +159,7 @@ class AconitySTUDIO_client:
         '''
         headers = {'content-type': 'application/json'}
         credentials = {'email': self.email, 'password': self.password}
-        
+
         response_data = await self.post(url = 'login',
                                         data= credentials,
                                         headers = headers)
@@ -176,11 +176,11 @@ class AconitySTUDIO_client:
         self._headers = headers
         logger.info(f'token: {token}')
         logger.info(f'user_id: {self.user_id}')
- 
+
     ##############################
     # HTTP REQUESTS GET/PUT/POST #
     ##############################
-    
+
     async def _http_request(self, method, url, log_level='info', headers={}, verbose=False, data=None, timeout = 300):
         if method not in ['put','post','get']:
             raise AttributeError('Invalid http request method. Must be put/post/get')
@@ -188,7 +188,7 @@ class AconitySTUDIO_client:
             raise ValueError(f'Invalid url: {url}. (contains "None")')
         if 'ping' not in url:
             logger.info(f'{method} {url}')
-            self.history.append(f'{method} {url}') 
+            self.history.append(f'{method} {url}')
         if headers == {}:
             headers = self._headers
 
@@ -240,9 +240,9 @@ class AconitySTUDIO_client:
             if log_level not in ['info', 'debug', 'error', 'warning']:
                 logger.warning(f'wrong log_level received :{log_level}. manually setting it to "info"')
                 log_level = 'info'
-            
+
             getattr(logger, log_level)(f'received:\n{json.dumps(result, indent=3)}')
-        
+
         return result
 
     async def get(self, url, log_level='debug', logger=True, headers={}, verbose=False, timeout=300):
@@ -298,7 +298,7 @@ class AconitySTUDIO_client:
             async with aiohttp.ClientSession(raise_for_status = True) as session:
                 async with session.get(url, headers = headers) as resp:
                     logger.info(f'saving batchdata to {save_to}')
-                    with open(save_to, 'wb') as fd:                
+                    with open(save_to, 'wb') as fd:
                         while True:
                             chunk = await resp.content.read(chunk_size)
                             if not chunk:
@@ -308,17 +308,17 @@ class AconitySTUDIO_client:
             logger.exception(f'Something went wrong with {url}. Please check if the file is corrupted in some way.')
             return None
         return save_to
-   
+
     ##############################
     # JOB / SCRIPT API FUNCTIONS #
     ##############################
 
     async def start_job(self, layers, execution_script,
                         job_id=None, channel_id = 'run0', parts='all'):
-        ''' 
+        '''
         Starts a job. The init/resume script will be generated automatically from the current job.
 
-        :param execution_script: The execution script which shall be executed. 
+        :param execution_script: The execution script which shall be executed.
         :type execution_script: string
 
         :param job_id: Id of the Job. Get it by calling get_job_id().
@@ -340,7 +340,7 @@ class AconitySTUDIO_client:
         self.job_info['end_layer'] = layers[1]
 
         init_script = job.create_init_script(layers = layers, parts = parts)
-        
+
         response = await self.post_script(init_script = init_script,
                                         execution_script = execution_script,
                                         job_id = job_id,
@@ -350,7 +350,7 @@ class AconitySTUDIO_client:
 
         if 'error' in response and 'error(s) in script. Could not execute! =>\n' in response['error']:
             logger.error(f'channel {channel_id} may be occupied. Try to shut it down ...')
-             
+
             stop_response = await self.get(f'script/{self.workunit_id}/stop/{channel_id}')
             if 'success' in stop_response and stop_response['success'] == 'machine will stop ...':
                 logger.info(f'channel {channel_id} successfully stopped')
@@ -361,7 +361,7 @@ class AconitySTUDIO_client:
         return response
 
     async def pause_job(self, workunit_id=None, channel_id='run0'):
-        ''' 
+        '''
         Pauses the running script on the given channel and workunit
 
         :param workunit_id: the route GET /script yields information about the current workunit_id
@@ -375,7 +375,7 @@ class AconitySTUDIO_client:
         if workunit_id == 'none' or workunit_id == None:
             logger.error(f'workunit_id is "{workunit_id}"" (type{type(workunit_id)}). Abort!')
             raise ValueError(f'workunit_id is "{workunit_id}"" (type{type(workunit_id)}). Abort!')
-        
+
         #create channel observer
         if self.studio_version == 1:
             number_of_checks = 1
@@ -385,7 +385,7 @@ class AconitySTUDIO_client:
 
         #post the script
         await asyncio.sleep(self.savety_sleep) # give the channel_done task a chance to catch the start
-        
+
         url = 'script/' + workunit_id + '/pause/' + channel_id
 
         try:
@@ -409,7 +409,7 @@ class AconitySTUDIO_client:
         return result
 
     async def resume_job(self, layers=None, parts = 'all', workunit_id = None, channel_id = 'run0'):
-        ''' 
+        '''
         Resumes the running job on the given channel and workunit.
 
         :param init_resume_script: the init/resume script.
@@ -436,12 +436,12 @@ class AconitySTUDIO_client:
 
         logging.info(f'resuming job with new goal to build layers {layers}....jobinfo: {self.job_info}')
         init_resume_script = self.job.create_init_resume_script(layers, parts)
-        
+
         result = await self.resume_script(init_resume_script = init_resume_script,
                                           workunit_id = workunit_id,
                                           channel_id = channel_id,
                                           file_path_given = False)
-        
+
         return result
 
     async def stop_job(self, workunit_id=None, channel='run0'):
@@ -475,7 +475,7 @@ class AconitySTUDIO_client:
         for laser_off_cmd in laser_off_cmds:
             await self.execute(channel = 'manual',
                                script  = laser_off_cmd)
-        
+
         #save disc space. no more data needed
         if (await self.config_has_component('camera')):
             await self.execute(channel = 'manual', script = '$m.stop_record_sensor($s[hsCamera])')
@@ -490,7 +490,7 @@ class AconitySTUDIO_client:
     async def change_global_parameter(self, param, value, check_boundaries=True):
         '''
         Change a global parameter in the locally saved job and synchronizes this change with the Server Database.
-        
+
         If the parameter may only have values confined in a certain range, the new value will be changed to fit these requirements.
         (Example: The parameter must lie in the interval [1, 10]. If the attempted change is to set the value to 12 the function sets it to 10.)
 
@@ -572,7 +572,7 @@ class AconitySTUDIO_client:
         :param script: The command(s) that the Server executes
         :type script: string
         '''
-       
+
         machine_id = utils._gather(self, logger, 'machine_id', machine_id)
 
         url = 'machine/' + machine_id + '/execute/' + channel
@@ -604,12 +604,12 @@ class AconitySTUDIO_client:
     async def post_script(self, init_script='', execution_script='',
                           job_id=None, channel_id = 'run0',
                           file_path_init_script = None, file_path_execution_script = None):
-        '''  
+        '''
         The client posts execution and init/resume scripts to the Server.
 
         If the response status is != 200, raises Exception.
-        Returns the body of the return json. 
-        
+        Returns the body of the return json.
+
         It is recommended that the API function `start_job` is used instead of this function, because `start_job` generates the init_script automatically.
 
         :param data: data to be posted
@@ -636,9 +636,9 @@ class AconitySTUDIO_client:
         :return: Returns the body of the return json from the request.
         :rtype: dict
         '''
- 
+
         job_id = utils._gather(self, logger, 'job_id', job_id)
-        
+
         if file_path_init_script != None:
             try:
                 with open(file_path_init_script) as init_file:
@@ -665,7 +665,7 @@ class AconitySTUDIO_client:
 
         logger.debug(f'POST init script:\n{init_script}\n')
         logger.debug(f'POST execution script:\n{execution_script}\n')
-        
+
         url = 'script/' + channel_id
         data = {
             'workunitId': job_id,
@@ -675,12 +675,12 @@ class AconitySTUDIO_client:
         }
 
         response = await self.post(url = url, data=data)
-     
+
 
         return response
 
     async def resume_script(self, init_resume_script, workunit_id = None, channel_id='run0', file_path_given = False):
-        ''' 
+        '''
         Resumes the running script on the given channel and workunit.
 
         :param init_resume_script: the init/resume script.
@@ -703,7 +703,7 @@ class AconitySTUDIO_client:
         url = 'script/' + workunit_id + '/resume/' + channel_id
         data = {'init' : init_resume_script}
         response = await self.post(url, data=data)
-        
+
         success_confirmation = 'execution will resume ...'
         try:
             if (response['success'] == success_confirmation)\
@@ -718,7 +718,7 @@ class AconitySTUDIO_client:
         except Exception as e:
             logger.error(f'resuming script failed: {e}\n{response}')
             raise
-            
+
         logger.info(f'{response}')
 
         return response
@@ -750,7 +750,7 @@ class AconitySTUDIO_client:
         '''
         When a job is running, a websockets receives information about how many addLayerCommands have been executed.
         This information is used to calculate the current layer number by adding it to the starting layer which was specified when a job was started.
-        
+
         :return: current layer number during a job
         :rtype: int
         '''
@@ -759,7 +759,7 @@ class AconitySTUDIO_client:
         current_layer = start + addlayer
         logger.info(f'current layer: start({start}) + number of addLayerCommands({addlayer}) = {current_layer}')
         return current_layer
-    
+
     async def _update_database(self):
         '''
         Updates the database with the job saved in the attribute job.
@@ -773,11 +773,11 @@ class AconitySTUDIO_client:
         except AttributeError:
             logger.exception('no job_id or job?')
             return
-        
+
         result = await self.put(url = url,
                                 data = job)
         return result
-    
+
     def _channel_paused(self, msg, channel):
         if msg.type == aiohttp.WSMsgType.CLOSED:
             logging.warning('->WS CLOSED')
@@ -786,14 +786,14 @@ class AconitySTUDIO_client:
             logging.warning('->WS ERROR')
             return
         msg = msg.json()
-    
+
         try:
             if msg['topic'] == 'run' and \
                 msg['data'][0]['msg'] == 'paused' and \
                 msg['data'][0]['channel'] == channel:
-                
+
                 logger.info(f'a command paused on channel {channel}!')
-                self.blocked[channel] = True                        
+                self.blocked[channel] = True
                 return True
         except KeyError:
             return False
@@ -816,7 +816,7 @@ class AconitySTUDIO_client:
                 msg['data'][0]['channel'] == channel:
 
                 logger.info(f'a command resumed on channel {channel}!')
-                self.blocked[channel] = True                        
+                self.blocked[channel] = True
                 return True
         except KeyError:
             return False
@@ -841,7 +841,7 @@ class AconitySTUDIO_client:
                         self.blocked[channel] = False
                         return True
                     if _msg == 'finished':
-                        logger.info(f'a command finished on channel {channel}.')                        
+                        logger.info(f'a command finished on channel {channel}.')
                         self.blocked[channel] = False
                         return True
                     if _msg == 'paused':
@@ -860,7 +860,7 @@ class AconitySTUDIO_client:
     async def subscribe_report(self, name):
         '''
         Subscribes to reports via the WebServer.
-        
+
         To get information about the reports use the route configurations/{client.config_id}/topics).
 
         :param name: name of report, example reports: 'state', 'task'.
@@ -878,17 +878,17 @@ class AconitySTUDIO_client:
             except AttributeError:
                 logger.debug('websocket connection not (yet) established, cant subscribe to report')
                 await asyncio.sleep(0.01)
-        
+
         logger.info(f'Subscription to report {name} sent!')
 
     async def subscribe_topic(self, name):
         '''
         Subscribes to reports via the WebServer.
-        
+
         To get information about the topics use the route configurations/{client.config_id}/topics).
 
         :param name: name of topic. Examples are 'State', 'Sensor','cmds' and 'Positioning'.
-        
+
         :type name: string
         '''
         task = {
@@ -952,7 +952,7 @@ class AconitySTUDIO_client:
                         'task': 'register'
                     }
                     await ws.send_json(task)
-                
+
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.CLOSED:
                             print('->WS CLOSED')
@@ -1019,7 +1019,7 @@ class AconitySTUDIO_client:
 
         :return: Session ID
         :rtype: string
-        ''' 
+        '''
         self.session_ids = await self.get('sessions') #all recorded sessions
         #print('ids...')
         #for i, id in enumerate(self.session_ids):
@@ -1031,7 +1031,7 @@ class AconitySTUDIO_client:
     async def get_machine_id(self, machine_name):
         '''
         Get the machine_id from a given Machine Name.
-        
+
         If no or multiple machines with the given name are given, raises ValueErrors.
         In this case, start the Browser based GUI AconitySTUDIO and copy the id from the URL and manually set the attribute machine_id.
 
@@ -1051,7 +1051,7 @@ class AconitySTUDIO_client:
                 cnt += 1
                 self.machine_name = machine['name']
                 self.machine_id = machine['_id']['$oid']
-     
+
         if cnt == 0:
             logger.error(f'machine "{machine_name}" cannot be found')
         elif cnt > 1:
@@ -1061,19 +1061,19 @@ class AconitySTUDIO_client:
             logger.info(f'self.machine_id: {self.machine_id}')
             logger.info(f'self.machine_name: {self.machine_name}')
             return self.machine_id
-       
+
     async def get_workunit_and_channel_id(self, result=None):
         '''
         Retrieves workunit_id and channel_id. If successfull,
         saves them in self.channel_id and self.workunit_id and returns them
-        
+
         If not successfull, raises a ValueError.
 
         :return: workunit_id, channel_id
         :rtype: tuple
         '''
         logger.info(f'trying to gather workunit_id from {result}')
-        
+
         if result == None:
             result = await self.get('script')
 
@@ -1084,7 +1084,7 @@ class AconitySTUDIO_client:
 
         # There can be different formats of the result.
         # Go through them one by one, return the first one that works
-        
+
         try:
             self.workunit_id = result['script']['execution']['workUnit']['workUnitId']
             self.channel_id = result['script']['execution']['channel']
@@ -1138,12 +1138,12 @@ class AconitySTUDIO_client:
             raise ValueError(f'More than one job with the name {job_name} found! Please set the job_id attribute manually (start GUI AconitySTUDIO -> copy from URL)')
         else:
             logger.info(f'self.job_name: {self.job_name}')
-            logger.info(f'self.job_id: {self.job_id}')                      
+            logger.info(f'self.job_id: {self.job_id}')
             return self.job_id
-        
+
     async def _get_job(self, job_id=None):
         job_id = utils._gather(self, logger, 'job_id', job_id)
-        job = await self.get(f'jobs/{job_id}')     
+        job = await self.get(f'jobs/{job_id}')
         self.job = utils.JobHandler(job, logger, self.studio_version)
         return self.job
 
@@ -1185,14 +1185,14 @@ class AconitySTUDIO_client:
             logger.info(f'self.config_name: {self.config_name}\t({config_state})')
             logger.info(f'self.config_id: {self.config_id}')
             if not self.config_operational:
-                logger.warning(f'config {config_name} exists, but is not operational')  
-                print(json.dumps(config,indent=3))                 
+                logger.warning(f'config {config_name} exists, but is not operational')
+                print(json.dumps(config,indent=3))
             return self.config_id
 
     async def config_has_component(self, component, config_id = None):
         '''
         Checks if a config has a certain component.
-        
+
         :param component: The component to be checked.
         :type component: string
 
@@ -1207,7 +1207,7 @@ class AconitySTUDIO_client:
         config_id = utils._gather(self, logger, 'config_id', config_id)
 
         url = f'configurations/{config_id}/components'
-        
+
         if not (await self.config_exists(config_id=config_id)):
             logger.warning(f'no config with the config_id {config_id} found!')
             raise ValueError(f'no config with the config_id {config_id} found!')
@@ -1222,8 +1222,8 @@ class AconitySTUDIO_client:
 
     async def config_exists(self, config_name=None, config_id=None):
         '''
-        Checks if a config exists. 
-        
+        Checks if a config exists.
+
         One can *either* use the config_name or the config_id as a search parameter (XOR).
         If this is not done, raises a ValueError.
 
@@ -1239,7 +1239,7 @@ class AconitySTUDIO_client:
            (config_name != None and config_id != None):
             logger.warning('please provide a config_name XOR config_id')
             raise ValueError('please provide a config_name XOR config_id')
-        
+
         configs = await self.get('configurations')
         for config in configs:
             if config['name'] == config_name:
@@ -1254,7 +1254,7 @@ class AconitySTUDIO_client:
     async def config_state(self, config_id=None):
         '''
         Returns the current state of the config
-        
+
         :param config_id: Id of the config. If none is given, the client uses its own attribute `config_id`.
         :type config_id: str
 
@@ -1303,7 +1303,7 @@ class AconitySTUDIO_client:
 
         self.lasers = set()
         components = await self.get(url)
-        
+
         for component in components: #type(components)==list, type(component)==dict
             if 'laser_beam_source::' in component['id']:
                 try:
@@ -1315,7 +1315,7 @@ class AconitySTUDIO_client:
                 self.lasers.add(laser_number)
         logger.info(f'detected lasers: {self.lasers}')
         return self.lasers
-  
+
 
     ################################
     # PYTHON CLIENT'S OWN DATABASE #
@@ -1349,7 +1349,7 @@ class AconitySTUDIO_client:
         by saving it into a Mongo database
         Call enable_pymongo_database() before calling this function
         '''
-        
+
         if self.pymongo_database == False:
             logger.error('No database configured. Call enable_pymongo_database')
             return

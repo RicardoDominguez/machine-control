@@ -29,7 +29,7 @@ class Machine:
 
         self.state_log = None
 
-        self.n_ignore = shared_cfg.n_ignore_buffer + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
+        self.n_ignore = shared_cfg.n_ignore + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS

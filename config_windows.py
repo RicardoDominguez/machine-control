@@ -57,7 +57,7 @@ def returnSharedCfg():
     cfg.save_dir1 = 'saves/'
     cfg.save_dir2 = ''#'/home/ricardo/'
 
-    cfg.n_ignore_buffer = 3
+    cfg.n_ignore = 3
     cfg.n_rand = 0
 
     cfg.ctrl_cfg.ac_ub = np.array([1.8, 140])
