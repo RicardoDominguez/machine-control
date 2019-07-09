@@ -79,7 +79,7 @@ class Cluster:
         self.pret_state_traj[:, self.t, :] = states[:self.n_parts_pretrained, :]
         self.lear_state_traj[:, self.t, :] = states[self.n_parts_pretrained:, :]
 
-        # At least one part learned, not trained first step
+        # TRAIN MODEL - at least one part learned, not trained first step
         if self.n_parts_learned > 0 and self.t!=0 and (self.t)%self.train_freq==0:
             print("Training model...")
             obs_in = self.lear_state_traj[:, self.t-self.train_freq:self.t, :].reshape(-1, self.lear_state_traj.shape[-1])
@@ -87,18 +87,59 @@ class Cluster:
             acs = self.lear_action_traj[:, self.t-self.train_freq:self.t, :].reshape(-1, self.lear_action_traj.shape[-1])
             self.policyLear.train(obs_in, obs_out, acs)
 
+        # COMPUTE ACTION
         action = np.zeros((self.s_cfg.env.n_parts, 2))
+        lastTempId = None
         for part in range(self.s_cfg.env.n_parts):
             print("Sampling actions %d/%d" % (part, self.s_cfg.env.n_parts))
             if part < self.n_parts_pretrained: # Pretrained policy
                 action[part, :], self.pred_cost_pret[self.t,part] = self.policyPret.act(states[part, :], self.t, get_pred_cost=True)
             else: # Learned policy
+                # Change target
+                if self.c_ler_cfg.ctrl_cfg.change_target:
+                    for i in range(len(self.c_ler_cfg.ctrl_cfg.n_parts_targets)):
+                        if (part - self.n_parts_pretrained) < self.c_ler_cfg.ctrl_cfg.n_parts_targets[i]:
+                            if not i == lastTempId:
+                                lastTempId = i
+                                self.policyLear.changeTargetCost(self.c_ler_cfg.ctrl_cfg.targets[i])
+                                break
+
                 if self.t < self.train_freq: # Do not predict cost
                     action[part, :] = self.policyLear.act(states[part, :], self.t, get_pred_cost=False)
                     self.pred_cost_lear[self.t,part-self.n_parts_pretrained] = 0
                 else:
                     action[part, :], self.pred_cost_lear[self.t,part-self.n_parts_pretrained] = \
                         self.policyLear.act(states[part, :], self.t, get_pred_cost=True)
+
+                # Force inputs from q/v , q/sqrt(v)
+                if (self.c_ler_cfg.ctrl_cfg.force.on and # setting enabled
+                   (part >= self.c_ler_cfg.ctrl_cfg.force.start_part - 1) and # suitable part
+                    self.t >= self.c_ler_cfg.ctrl_cfg.force.init_buffer - 1): # past initial buffer time
+
+                    part_rel = part - self.c_ler_cfg.ctrl_cfg.force.start_part + 1 # part w.r.t. first forced part
+                    t_rel = self.t - self.c_ler_cfg.ctrl_cfg.force.init_buffer + 1 # t w.r.t. first event t
+                    n_after_event = t_rel % self.c_ler_cfg.ctrl_cfg.force.delta # t w.r.t. last event t
+
+                    print("t %d, t_rel %d, n_after_event %d, part %d, part_rel %d" % (self.t, t_rel, n_after_event, part, part_rel))
+
+                    part_repeat = int(part_rel / (self.c_ler_cfg.ctrl_cfg.force.n_parts*len(self.c_ler_cfg.ctrl_cfg.force.n_repeats))) # disregard if its upper/lower bound
+                    part_repeat_2 = part_rel % (self.c_ler_cfg.ctrl_cfg.force.n_parts*len(self.c_ler_cfg.ctrl_cfg.force.n_repeats))
+                    repeat_i = int(part_repeat_2 / self.c_ler_cfg.ctrl_cfg.force.n_parts) # determines how many repeats
+
+                    print("part_repeat %d, part_repeat2 %d, repeat_i %d, n_repeats %d" % (part_repeat, part_repeat_2, repeat_i, self.c_ler_cfg.ctrl_cfg.force.n_repeats[repeat_i]))
+
+                    if n_after_event < self.c_ler_cfg.ctrl_cfg.force.n_repeats[repeat_i]: # Update frequency
+                        lev = int(t_rel / self.c_ler_cfg.ctrl_cfg.force.delta) # Update number
+                        v = self.c_ler_cfg.ctrl_cfg.force.fixed_speed
+                        if part_repeat == 0: # Upper bound
+                            upper = self.c_ler_cfg.ctrl_cfg.force.upper_init + self.c_ler_cfg.ctrl_cfg.force.upper_delta * lev
+                            q = upper * np.sqrt(v)
+                            print("For part %d, power forced %d (upper limit %d)" % (part, q, upper))
+                        else: # Lower bound
+                            lower = self.c_ler_cfg.ctrl_cfg.force.lower_init + self.c_ler_cfg.ctrl_cfg.force.lower_delta * lev
+                            q = lower * v
+                            print("For part %d, power forced %d (lower limit %d)" % (part, q, lower))
+                        action[part, :] = [v, q]
 
         self.pret_action_traj[:, self.t, :] = action[:self.n_parts_pretrained, :]
         self.lear_action_traj[:, self.t, :] = action[self.n_parts_pretrained:, :]

@@ -19,7 +19,7 @@ class TensorStandardScaler:
         Returns: None.
         """
         self.fitted = False
-        with tf.variable_scope("Scaler"):
+        with tf.variable_scope( "Scaler"):
             self.mu = tf.get_variable(
                 name="scaler_mu"+str(name), shape=[1, x_dim], initializer=tf.constant_initializer(0.0),
                 trainable=False
@@ -105,7 +105,7 @@ class TensorStandardScaler1D(TensorStandardScaler):
         Returns: None.
         """
         self.fitted = False
-        with tf.variable_scope("Scaler"):
+        with tf.variable_scope("Scaler", reuse=tf.AUTO_REUSE):
             self.mu = tf.get_variable(
                 name="scaler_mu"+str(name), shape=[1], initializer=tf.constant_initializer(0.0),
                 trainable=False

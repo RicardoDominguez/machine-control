@@ -135,11 +135,14 @@ class Aconity:
     async def _changeLaserPower(self, part, value, buffer):
         if self.m_cfg.aconity.laser_on:
             await self.client.change_part_parameter(self.pieceNumber(part, buffer), 'laser_power', value)
+        else:
+            await self.client.change_part_parameter(self.pieceNumber(part, buffer), 'laser_power', 0)
 
     async def initialParameterSettings(self):
         # Slowly scan the ones ignored
         for i in range(self.parts_ignored):
-            await self._changeMarkSpeed(i, self.m_cfg.aconity.ignored_parts_speed, 0)
+            await self._changeMarkSpeed(i, self.m_cfg.aconity.ignored_parts_speed*1000, 0)
+            await self._changeLaserPower(i, self.m_cfg.aconity.ignored_parts_power, 0)
 
         # Parameters that will remain unchanged
         fixed_params = self.m_cfg.aconity.fixed_params

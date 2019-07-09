@@ -108,6 +108,7 @@ class MPC(Controller):
         self.plan_hor = get_required_argument(params.opt_cfg, "plan_hor", "Must provide planning horizon.")
         self.og_plan_hor = self.plan_hor
         self.obs_cost_fn = get_required_argument(params.opt_cfg, "obs_cost_fn", "Must provide cost on observations.")
+        self.target = get_required_argument(params.opt_cfg, "target", "Must provide cost on observations.")
         self.ac_cost_fn = get_required_argument(params.opt_cfg, "ac_cost_fn", "Must provide cost on actions.")
 
         self.save_all_models = params.log_cfg.get("save_all_models", False)
@@ -198,6 +199,12 @@ class MPC(Controller):
         if dim_diff > 0:
             self.prev_sol = self.prev_sol[:-dim_diff]
             self.init_var = self.init_var[:-dim_diff]
+
+    def changeTargetCost(self, target):
+        print("Target changed to", target)
+        self.target = target
+        self.pred_cost, self.pred_traj = self._compile_cost(self.ac_seq, get_pred_trajs=True)
+        self.optimizer.setup(self._compile_cost, True)
 
     def train(self, obs_trajs, obs_prime_trajs, acs_trajs): # Just trains model!!
         """Trains the internal model of this controller. Once trained,
@@ -384,7 +391,7 @@ class MPC(Controller):
                 # next_obs = tf.Print(next_obs,[next_obs_mean], "next_obs: ", summarize=10)
                 # Compute cost of states (both observation and action)
                 delta_cost = tf.reshape(
-                    self.obs_cost_fn(next_obs) + self.ac_cost_fn(cur_acs), [-1, self.npart] # (N, particles)
+                    self.obs_cost_fn(next_obs, self.target) + self.ac_cost_fn(cur_acs), [-1, self.npart] # (N, particles)
                 )
 
                 # Postporcess again
@@ -415,7 +422,7 @@ class MPC(Controller):
                 cur_acs = ac_seqs[t]
                 next_obs = self._predict_next_obs(cur_obs, cur_acs)
                 delta_cost = tf.reshape(
-                    self.obs_cost_fn(next_obs) + self.ac_cost_fn(cur_acs), [-1, self.npart]
+                    self.obs_cost_fn(next_obs, self.target) + self.ac_cost_fn(cur_acs), [-1, self.npart]
                 )
                 return t + 1, total_cost + delta_cost, self.obs_postproc2(next_obs)
 

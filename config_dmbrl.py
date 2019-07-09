@@ -54,8 +54,7 @@ def targ_proc(obs, next_obs):
 
 # Cost functions
 # ------------------------------------------------------------------------------
-def obs_cost_fn(obs):
-    target = cfg_global.TEMPERATURE_TARGET
+def obs_cost_fn(obs, target):
     k = 1000
     if isinstance(obs, np.ndarray):
         return -np.exp(-np.sum(np.square((obs-target)), axis=-1)/k)
@@ -90,6 +89,7 @@ def create_dmbrl_config():
 
     cfg.ctrl_cfg.opt_cfg.obs_cost_fn = obs_cost_fn
     cfg.ctrl_cfg.opt_cfg.ac_cost_fn = ac_cost_fn
+    cfg.ctrl_cfg.opt_cfg.target = cfg_global.TEMPERATURE_TARGET
 
     # Controller logging info
     cfg.ctrl_cfg.log_cfg.save_all_models = False
