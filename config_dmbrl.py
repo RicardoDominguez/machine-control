@@ -10,6 +10,7 @@ Global variables:
 from dotmap import DotMap
 import numpy as np
 import tensorflow as tf
+import config_windows as cfg_global
 from dmbrl.modeling.models import BNN
 from dmbrl.modeling.layers import FC
 from dmbrl.misc.DotmapUtils import get_required_argument
@@ -106,18 +107,23 @@ def targ_proc(obs, next_obs):
 
 # Cost functions
 # ------------------------------------------------------------------------------
-def obs_cost_fn(obs):
+<<<<<<< HEAD:dmbrl_config.py
+def obs_cost_fn(obs, target):
     """ Cost function (state-dependent) used in the optimisation problem.
 
     Should process both np.arrays and tf.Tensor inputs.
 
     Arguments:
         obs (np.array or tf.Tensor): Array of observations with shape (`n`, `dO`).
+        target (float)
 
     Returns:
         float
     """
     target = 980
+=======
+def obs_cost_fn(obs, target):
+>>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190:config_dmbrl.py
     k = 1000
     if isinstance(obs, np.ndarray):
         return -np.exp(-np.sum(np.square((obs-target)), axis=-1)/k)
@@ -164,6 +170,7 @@ def create_dmbrl_config():
 
     cfg.ctrl_cfg.opt_cfg.obs_cost_fn = obs_cost_fn
     cfg.ctrl_cfg.opt_cfg.ac_cost_fn = ac_cost_fn
+    cfg.ctrl_cfg.opt_cfg.target = cfg_global.TEMPERATURE_TARGET
 
     # Controller logging info
     cfg.ctrl_cfg.log_cfg.save_all_models = False

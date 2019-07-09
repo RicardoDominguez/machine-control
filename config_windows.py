@@ -2,23 +2,8 @@
 from dotmap import DotMap
 import numpy as np
 
-def get_n_parts():
-    """Returns the number of parts to be built.
-
-    This excludes the parts being ignored (cfg.n_ignore)
-
-    Returns:
-        int: Number of parts to be built.
-    """
-    return 20
-
-def get_layers():
-    """Returns the layer range to be built, as [layer_min, layer_max]
-
-    Returns:
-        array of ints: Layer range to build.
-    """
-    return [1, 153]
+TEMPERATURE_TARGET = 980
+LAYERS = [1, 165]
 
 def returnSharedCfg():
     """Return shared configuration parameters.
@@ -48,9 +33,15 @@ def returnSharedCfg():
     cfg.comms.state.rdy_name = 'state_rdy'
     cfg.comms.state.f_name = 'states.npy'
     cfg.env.nS = 16
-    cfg.env.n_parts = get_n_parts()
-    layers = get_layers()
-    cfg.env.horizon = layers[1]-layers[0]+1
+    cfg.env.n_parts = 33
+    cfg.env.horizon = LAYERS[1]-LAYERS[0]+1
+
+    cfg.save_dir1 = 'saves/'
+    cfg.save_dir2 = ''#'/home/ricardo/'
+
+    cfg.parts_ignored = 3
+
+    cfg.env.init_params = [1.125, 110]
 
     cfg.save_dir1 = 'saves/'
     cfg.save_dir2 = ''
@@ -85,16 +76,18 @@ def returnMachineCfg():
     """
     cfg = DotMap()
 
-    cfg.comms.cluster_dir = 'machine-control/'
+    cfg.comms.cluster_dir = 'CONSTRAINS/'#'machine-control/'
     cfg.comms.sftp.host = 'scentrohpc.shef.ac.uk'
     cfg.comms.sftp.user = 'ricardo'
     cfg.comms.sftp.pwd = 'aw%qzv'
     cfg.aconity.info.config_name = 'Unheated 3D Monitoring Recalibrated'
-    cfg.aconity.info.job_name = 'H282Control2'
-    cfg.aconity.layers = get_layers()
-    cfg.aconity.n_parts = get_n_parts()
+    cfg.aconity.info.job_name = 'Constrained'
+    cfg.aconity.layers = LAYERS
     cfg.aconity.process.sess_dir = 'C:/AconitySTUDIO/log/'
-    cfg.aconity.process.sleep_t = 2.5
-
-    cfg.aconity.open_loop = np.ones((10,2))*[1.125, 110]
+    cfg.aconity.process.sleep_t = 5
+    cfg.aconity.ignored_parts_speed = 1.125
+    cfg.aconity.ignored_parts_power = 110
+    cfg.aconity.part_delta = 1
+    cfg.aconity.fixed_params = np.ones((0,2))*[1.125, 0]
+    cfg.aconity.laser_on = True
     return cfg

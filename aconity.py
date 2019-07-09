@@ -8,7 +8,11 @@ import pysftp
 import asyncio
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-from AconitySTUDIO_client import AconitySTUDIO_client
+
+from AconitySTUDIO_client import AconitySTUDIOPythonClient
+from AconitySTUDIO_client import utils
+
+from process.process_main import *
 
 def getLoginData():
     """ Returns the login credentials for the Aconity machine.
@@ -77,16 +81,15 @@ class Aconity:
         self.curr_layer = aconity_cfg.layers[0]
         self.job_paused = False
 
-        # Parts ignored because the pyrometer ofen does not provide readings for them
-        self.n_ignore = shared_cfg.n_ignore
-        # Index of first part with parameters conrolled in real-time
-        self.control_buffer = shared_cfg.n_ignore
-        # Index of first part with fixed parameters
-        self.fixed_params_buffer = self.control_buffer + shared_cfg.env.n_parts
+        # Parts distributed as...
+        #   - [1, parts_ignored] - Parts built in case pyrometer does not record
+        #   - [parts_ignored + 1, control_buffer] - Closed loop parts
+        #   - [control_buffer + 1, fixed_buffer] - Parts with fixed parameters
+        self.parts_ignored = shared_cfg.parts_ignored
+        self.control_buffer = self.parts_ignored
+        self.fixed_buffer = self.control_buffer + shared_cfg.env.n_parts
 
-        # Upper and lower bound for the build parameters
-        self.ac_lb = shared_cfg.ctrl_cfg.ac_lb
-        self.ac_ub = shared_cfg.ctrl_cfg.ac_ub
+        self.uploadConfigFiles()
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -105,7 +108,7 @@ class Aconity:
         # Wait until RDY signal is provided
         print("Waiting for actions...")
         no_error = 1
-        while(no_error): # Prevent OS errors from crashing the code
+        while(no_error):
             while(not os.path.isdir(rdy)): await asyncio.sleep(0.05)
             try:
                 os.rmdir(rdy) # Delete RDY
@@ -129,9 +132,38 @@ class Aconity:
         cfg = self.s_cfg.comms.state
         os.mkdir(dir+cfg.rdy_name) # RDY signal
 
+    def uploadConfigFiles(self):
+        comms = self.m_cfg.comms
+        cfg = self.m_cfg.comms.sftp
+
+        # Set up connection
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
+        sftp = pysftp.Connection(host=cfg.host, username=cfg.user,
+            password=cfg.pwd, cnopts=cnopts)
+
+        # Transfer config files
+        print("Uploading configuration files to %s..." % (comms.cluster_dir))
+        config_files = ['config_cluster.py', 'config_dmbrl.py', 'config_windows.py']
+        for file in config_files: sftp.put(file, comms.cluster_dir+file)
+
+        # Clear local comms
+        cfg = self.s_cfg.comms
+        dir_action = cfg.dir+cfg.action.rdy_name
+        dir_state = cfg.dir+cfg.state.rdy_name
+        if os.path.isdir(dir_action): os.rmdir(dir_action)
+        if os.path.isdir(dir_state): os.rmdir(dir_state)
+
+        sftp.close()
+
+
     # --------------------------------------------------------------------------
     # ACONITY FUNCTIONS
     # --------------------------------------------------------------------------
+    def pieceNumber(self, piece_indx, buffer):
+        """ 0->4, 1->7, 2->10, etc... """
+        """ 0->2, 1->3, 2->4, etc..."""
+        return int((piece_indx+buffer)*self.m_cfg.aconity.part_delta+1)
 
     async def initAconity(self):
         """Creates a new connection to the AconityMINI using the job name provided.
@@ -151,54 +183,40 @@ class Aconity:
         This parameters are defined in the configuration files rather than being
         passed an input to this function.
         """
-        # Slowly scan the parts being ignored
-        for i in range(self.n_ignore):
-            await self.client.change_part_parameter(i+1, 'mark_speed', 3000)
+        # Slowly scan the ones ignored
+        for i in range(self.parts_ignored):
+            await self._changeMarkSpeed(i, self.m_cfg.aconity.ignored_parts_speed*1000, 0)
+            await self._changeLaserPower(i, self.m_cfg.aconity.ignored_parts_power, 0)
 
-        # Initialise the parts with fixed parameters
-        open_loop = self.a_cfg.aconity.open_loop
-        for i in range(open_loop.shape[0]):
-            await self.client.change_part_parameter(pieceNumber(i, self.fixed_params_buffer), 'mark_speed', open_loop[i,0]*1000)
-            await self.client.change_part_parameter(pieceNumber(i, self.fixed_params_buffer), 'laser_power', open_loop[i,1])
+        # Parameters that will remain unchanged
+        fixed_params = self.m_cfg.aconity.fixed_params
+        for i in range(fixed_params.shape[0]):
+            await self._changeMarkSpeed(i, fixed_params[i,0]*1000, self.fixed_buffer)
+            await self._changeLaserPower(i, fixed_params[i,1], self.fixed_buffer)
 
-    def _pieceNumber(self, piece_indx, n_ignore):
-        """Returns the index given by AconityStudio to each individual part.
-
-        For instance, if the first part should be ignored, and part numbers increase
-        three by three, then `return int((piece_indx+1)*3+1)` should be used, thus
-        0 -> 4, 1 -> 7, 2 -> 10, etc.
-
-        On the other hand, if the first three parts should be ignored, and part numbers
-        increase one by one, then `return int((piece_indx+3)+1)` should be used, thus
-        0 -> 4, 1 -> 5, 2 -> 6, etc.
-
-        Arguments:
-            piece_indx (int): Input index, starting from 0.
-            n_ignore (int): Number of initial parts that should be ignored.
-
-        Returns:
-            int: Output index as used by AconityStudio.
-        """
-        return int((piece_indx+n_ignore)+1)
-
-    async def _changeMarkSpeed(self, part, value):
+    async def _changeMarkSpeed(self, part, value, buffer):
         """Changes the mark speed of an individual part.
 
         Arguments:
             part (int): Index of part (from 0 to n_parts).
             value (float): Value to be assigned as the mark speed.
+            buffer (int): Global part number is buffer + part.
         """
-        print("Writing speed to %d " % (pieceNumber(part, self.control_buffer)))
-        await self.client.change_part_parameter(pieceNumber(part, self.control_buffer), 'mark_speed', value)
+        print("Writing to %d " % (self.pieceNumber(part, buffer)))
+        await self.client.change_part_parameter(self.pieceNumber(part, buffer), 'mark_speed', value)
 
-    async def _changeLaserPower(self, part, value):
+    async def _changeLaserPower(self, part, value, buffer):
         """Changes the laser power of an individual part.
 
         Arguments:
             part (int): Index of part (from 0 to n_parts).
             value (float): Value to be assigned as the laser power.
+            buffer (int): Global part number is buffer + part.
         """
-        await self.client.change_part_parameter(pieceNumber(part, self.control_buffer), 'laser_power', value)
+        if self.m_cfg.aconity.laser_on:
+            await self.client.change_part_parameter(self.pieceNumber(part, buffer), 'laser_power', value)
+        else:
+            await self.client.change_part_parameter(self.pieceNumber(part, buffer), 'laser_power', 0)
 
     async def _pauseUponLayerCompletion(self, sleep_time=0.05):
         """Awaits the current layer to be complete and then pauses the build.
@@ -227,9 +245,10 @@ class Aconity:
             actions (np.array): Input parameters to be used for the new layer, with shape (`n_parts`, 2)
         """
         print("Actions chosen", actions)
-        cfg = self.a_cfg.aconity
-        assert cfg.n_parts == actions.shape[0], \
-            "Mismatch %d != %d" % (cfg.n_parts, actions.shape[0])
+        layers = self.m_cfg.aconity.layers
+        n_parts = self.s_cfg.env.n_parts
+        assert n_parts == actions.shape[0], \
+            "Mismatch %d != %d" % (n_parts, actions.shape[0])
 
         # Random parameters
         rand_param = np.random.rand(self.n_rand, 2)*(self.ac_ub-self.ac_lb)+self.ac_lb
@@ -239,20 +258,20 @@ class Aconity:
             await self.client.change_part_parameter(pieceNumber(i, self.rnd_buffer), 'laser_power', rand_param[i,1])
 
         # Change parameters
-        for part in range(cfg.n_parts):
+        for part in range(n_parts):
             print("Part", part, "Setting parameters...", actions[part, :])
-            await self._changeMarkSpeed(part, actions[part, 0]*1000)
-            await self._changeLaserPower(part, actions[part, 1])
+            await self._changeMarkSpeed(part, actions[part, 0]*1000, self.control_buffer)
+            await self._changeLaserPower(part, actions[part, 1], self.control_buffer)
 
         # Resume / start job as appropiate
         if self.job_started:
             print("Wait for job to be paused")
             while(not self.job_paused): pass
-            await self.client.resume_job(layers=cfg.layers)
+            await self.client.resume_job(layers=layers)
             self.job_paused = False
-        else: # First time performLayer() is called, this is executed
-            execution_script = getgetExecutionScript()
-            await self.client.start_job(cfg.layers, execution_script)
+        else:
+            execution_script = getUnheatedMonitoringExecutionScript()
+            await self.client.start_job(layers, execution_script)
             await self.initialParameterSettings()
             print("Job started...")
             self.job_started = True
@@ -260,6 +279,9 @@ class Aconity:
 
         # Log actions taken
         np.save("saves/rand_param_l_%d.npy" % (self.curr_layer), rand_param)
+        np.save("saves/param_l_%d.npy" % (self.curr_layer), actions)
+
+        # Log actions taken
         np.save("saves/param_l_%d.npy" % (self.curr_layer), actions)
 
         await self._pauseUponLayerCompletion()
@@ -283,4 +305,19 @@ class Aconity:
         while self.curr_layer <= max_layer:
             print("Layer %d/%d" % (self.curr_layer, max_layer))
             actions = await self.getActions()
-            await self.performLayer(actions) # Build layer
+            await self.performLayer(actions)
+
+if __name__ == '__main__':
+    import sys
+    from config_windows import returnSharedCfg, returnMachineCfg
+
+    async def main():
+        s_cfg = returnSharedCfg()
+        m_cfg = returnMachineCfg()
+        aconity = Aconity(s_cfg, m_cfg)
+
+        utils.log_setup(sys.argv[0], directory_path='')
+        await aconity.initAconity()
+        await aconity.loop()
+
+    asyncio.run(main(), debug=True)
