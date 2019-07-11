@@ -59,7 +59,7 @@ project = 'Aconity Control'
 copyright = '2019, The University of Sheffield'
 author = 'Ricardo Dominguez-Olmedo'
 
-autodoc_mock_imports = ["AconitySTUDIO_client", 'AconitySTUDIO_utils', "dotmap", "tensorflow"]
+autodoc_mock_imports = ["AconitySTUDIO_client", 'AconitySTUDIO_utils', "dotmap", "tensorflow","pysftp","tqdm", "conf"]
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
