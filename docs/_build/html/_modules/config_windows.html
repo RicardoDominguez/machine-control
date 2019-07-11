@@ -153,8 +153,126 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="config-windows-module">
-<h1>config_windows module<a class="headerlink" href="#config-windows-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-config_windows">
+<span id="config-windows-module"></span><h1>config_windows module<a class="headerlink" href="#module-config_windows" title="Permalink to this headline">¶</a></h1>
+<p>Defines the configuration parameters used by the <cite>Aconity</cite>, <cite>Machine</cite> and <cite>Cluster</cite> classes.</p>
+<ul class="simple">
+<li><p>LASER_ON (bool): Laser is enabled when True.</p></li>
+<li><p>JOB_NAME (str): Job name as displayed in the AconitySTUDIO web application.</p></li>
+<li><p>LAYERS (array of int): Layer range to be built, as [layer_min, layer_max].</p></li>
+<li><p>N_PARTS (int): Number of parts to be built (not regarding ignored parts).</p></li>
+<li><p>N_STATES (int): Number of low-dimensional states used for the processing of the raw pyrometer data.</p></li>
+<li><p>TEMPERATURE_TARGET (float): Temperature target in mV.</p></li>
+<li><p>N_PARTS_IGNORED (int): Number of additional parts to be built on top of <cite>N_PARTS</cite> (pyrometer may not record data for the first few parts).</p></li>
+<li><p>IGNORED_PARTS_SPEED (float): Scan speed used for parts being “ignored”.</p></li>
+<li><p>IGNORED_PARTS_POWER (float): Laser power used for parts being “ignored”.</p></li>
+<li><p>N_PARTS_FIXED_PARAMS (int): Number of parts built using fixed build parameters.</p></li>
+<li><p>FIXED_PARAMS (array): Parameters to be used for those parts being built with fixed build parameters, as [speed (m/s), power (W)]</p></li>
+<li><p>SLEEP_TIME_READING_FILES (float): Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.</p></li>
+<li><p>PART_DELTA (int): Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).</p></li>
+</ul>
+<dl class="function">
+<dt id="config_windows.returnMachineCfg">
+<code class="descclassname">config_windows.</code><code class="descname">returnMachineCfg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#config_windows.returnMachineCfg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configuration parameters for the <cite>Machine</cite> class.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>comms: Configuration parameters for server communication.</dt><dd><ul>
+<li><p>cluster_dir: Location of the code within the remote server.</p></li>
+<li><dl class="simple">
+<dt>sftp: Configuration parameters for SFTP communication.</dt><dd><ul>
+<li><p>host: Address of the remote server, i.e. scentrohpc.shef.ac.uk</p></li>
+<li><p>user: User name (login credentials).</p></li>
+<li><p>pwd: Password (login credentials).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>aconity: Machine parameters for the use of the Aconity API.</dt><dd><ul>
+<li><dl class="simple">
+<dt>info</dt><dd><ul>
+<li><p>config_name: Configuration name, i.e. <cite>Unheated 3D Monitoring</cite>.</p></li>
+<li><p>job_name: Job name as displayed in the AconitySTUDIO web application.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>layers: Layer range to be bu- open_loop: Parameters used to build the parts built using fixed parameters, np.array with shape (<cite>n_fixed_parts</cite>, 2) as [layer_min, layer_max]</p></li>
+<li><p>n_parts: Number of parts to be built, excluding ignored parts.</p></li>
+<li><dl class="simple">
+<dt>process: ConfiguLASER_ONration parameters for processing sensory data.</dt><dd><ul>
+<li><p>sess_dir: Folder where pyrometer data is stored by the Aconity machine.</p></li>
+<li><p>sleep_t: Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.</p></li>
+<li><p>debug_dir: Folder where to save information useful for debugging.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>ignored_parts_power: Scan speed used for parts being “ignored”.</p></li>
+<li><p>ignored_parts_speed: Laser power used for parts being “ignored”.</p></li>
+<li><p>part_delta: Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).</p></li>
+<li><p>fixed_params: Parameters used for those parts being built with fixed parameters, with shape (<cite>n_fixed_parts</cite>, 2)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_windows.returnSharedCfg">
+<code class="descclassname">config_windows.</code><code class="descname">returnSharedCfg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#config_windows.returnSharedCfg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return shared configuration parameters.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>comms: Configuration parameters for server communication.</dt><dd><ul>
+<li><p>dir: Directory where files and folders will be written.</p></li>
+<li><dl class="simple">
+<dt>action</dt><dd><ul>
+<li><p>rdy_name: Name of folder created to signal action data has been written.</p></li>
+<li><p>f_name: Name of .npy file containing the actions computed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>state</dt><dd><ul>
+<li><p>rdy_name: Name of folder created to signal state data has been uploaded.</p></li>
+<li><p>f_name: Name of .npy file containing the state vectors processed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>env)]</dt><dd><ul>
+<li><p>nS: Dimensionality of the state vector.</p></li>
+<li><p>n_parts: Number of parts to be built (not regarding ignored parts).</p></li>
+<li><p>horizon: MDP event horizon (number of timesteps = number of layers).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>n_ignore: Number of additional parts to be built on top of <cite>env.n_parts</cite> (pyrometer may not record data for the first few parts).</p></li>
+<li><dl class="simple">
+<dt>ctrl_cfg</dt><dd><ul>
+<li><p>ac_ub: Upper bounds of the build parameter in the form [speed (m/s), power (W)].</p></li>
+<li><p>ac_lb: Lower bounds of the build parameter in the form [speed (m/s), power (W)].</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
 </div>
 
 

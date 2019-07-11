@@ -1,10 +1,10 @@
-============
+================================================
 Installing, running and enhancing the software
-============
+================================================
 
-------------
+------------------------------------
 Installing required dependencies
-------------
+------------------------------------
 
 The simplest way to install all required software packages is using `conda`.
 
@@ -29,9 +29,9 @@ For a GPU installation use::
 If there are dependencies missing, these can be installed using `pip` or `conda`
 in the typical Python fashion.
 
------------
+----------------------
 Running the software
------------
+----------------------
 
 First, one must set the desired configuration for the build. The configuration files are:
 
@@ -54,9 +54,9 @@ After setting the desired configuration, one must:
 
   - Run `machine.py` (i.e. using the Python IDLE)
 
------------
+-----------------------
 Enhancing the software
------------
+-----------------------
 
   - To implement a different control strategy, modify the function `computeAction()` in `cluster.py`.
   - To make changes to the current control strategy, modify the relevant files within `dmbrl/`
@@ -131,9 +131,9 @@ of the data is done, so that the magnitude of all your state elements is similar
 Otherwise model performance will be degraded. To change the scaler functionality, make changes
 to `dmbrl/modeling/utils/ModelScaler.py` as needed.
 
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Dividing a part into multiple "subparts"
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This approach aims to improve `intra`-layer temperature homogeneity. There are
 two sides to this problem. First, one probably wants to model the entire part as

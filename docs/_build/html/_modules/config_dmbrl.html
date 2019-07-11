@@ -153,8 +153,213 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="config-dmbrl-module">
-<h1>config_dmbrl module<a class="headerlink" href="#config-dmbrl-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-config_dmbrl">
+<span id="config-dmbrl-module"></span><h1>config_dmbrl module<a class="headerlink" href="#module-config_dmbrl" title="Permalink to this headline">¶</a></h1>
+<p>Low level configuration for modeling and optimisation.</p>
+<ul>
+<li><p>ctrl_cfg: Configuration parameters for the control algorithm.</p>
+<blockquote>
+<div><p>-dO: dimensionality of observations
+-dU: dimensionality of control inputs
+- per: How often the action sequence will be optimized, i.e, for per=1 it is reoptimized at every call to <cite>MPC.act()</cite>.
+- constrains: [[np.array([min v, min q]), np.array([max v, max q])], [min q/v, max q/v], [min q/sqrt(v), max q/sqrt(v)]]
+- prop_cfg: Configuration parameters for modeling and uncertainty propagation.</p>
+<blockquote>
+<div><ul>
+<li><p>model_pretrained: <cite>True</cite> if model used for MPC has been trained on previous data, <cite>False</cite> otherwise.</p></li>
+<li><p>model_init_cfg: Configuration parameters for model initialisation.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ensemble_size: Number of models within the ensemble.</p></li>
+<li><p>load_model: <cite>True</cite> for a pretrained model to be loaded upon initialisation.</p></li>
+<li><p>model_dir: Directory in which the model files (.mat, .nns) are located.</p></li>
+<li><p>model_name: Name of the model files (model_dir/model_name.mat or model_dir/model_name.nns)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>model_train_cfg: Configuration parameters for model training optimisation</dt><dd><ul class="simple">
+<li><p>batch_size: Batch size.</p></li>
+<li><p>epochs: Number of training epochs.</p></li>
+<li><p>hide_progress: If ‘True’, additional information regarding model training is printed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>npart: Number of particles used for uncertainty propagation.</p></li>
+<li><p>model_in: Number of inputs to the model.</p></li>
+<li><p>model_out: Number of outputs to the model.</p></li>
+<li><p>n_layers: Number of hidden layers.</p></li>
+<li><p>n_neurons: Number of neurons per hidden layer.</p></li>
+<li><p>learning_rate: Learning rate.</p></li>
+<li><p>wd_in: Weight decay for the input layer neurons.</p></li>
+<li><p>wd_hid: Weight decay for the hidden layer neurons.</p></li>
+<li><p>wd_out: Weight decay for the output layer neurons.</p></li>
+</ul>
+</div></blockquote>
+<ul>
+<li><p>opt_cfg: Configuration parameters for optimisation.</p>
+<blockquote>
+<div><ul>
+<li><p>mode: Uncertainty propagation method.</p></li>
+<li><p>plan_hor: Planning horizon for the model predictive control algorithm.</p></li>
+<li><p>cfg</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>popsize: Number of cost evaluations per iteration.</p></li>
+<li><p>max_iters: Maximum number of optimisation iterations.</p></li>
+<li><p>num_elites: Number of elites.</p></li>
+<li><p>alpha: Alpha parametero of the CEM optimisation algorithm.</p></li>
+<li><p>eps: Epsilon parameter of the CEM optimisation algorithm.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>prop_cfg</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>mode: Uncertainty propagation method, ie “TSinf”</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>change_target: True if multiple setpoints used, i.e. 980 and 1010</p></li>
+<li><p>n_parts_targets: Number of parts to be built for each target</p></li>
+<li><p>targets: Different temperature setpoints to be used (must be of same length as <cite>n_parts_targets</cite>)</p></li>
+<li><p>force: Configuration parameters to periodically overwrite (“force”) predefined build parameters</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>on: Force functionality enabled if True</p></li>
+<li><p>start_part: First part where functionality is enabled (disregarding the first few ignored parts)</p></li>
+<li><p>n_parts: Number of parts for which the functionality is enabled</p></li>
+<li><p>n_repeats: Number of consecutive layers for which inputs are forced. For [1,2], n_parts will be forced only once (periodically), while a further n_parts will be forced two times consecutively (periodically)</p></li>
+<li><p>init_buffer: Initial number of layers for which parameters are not forced</p></li>
+<li><p>upper_init: Upper bound is initialised to this.</p></li>
+<li><p>upper_delta: Upper bound increases by this. For instance, for upper_init=105 and upper_delta=5, the upper bound sequence will be 105, 110, 115…</p></li>
+<li><p>lower_init: Lower bound is initialised to this.</p></li>
+<li><p>lower_delta: Lower bound is increased by this. For instance, for lower_init=65 and lower_delta=-5, the lower bound sequence will be 60, 55, 50…</p></li>
+<li><p>fixed_speed: For the forced parameters, power will be adjusted but mark speed will be kept fixed to this value.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<dl class="function">
+<dt id="config_dmbrl.ac_cost_fn">
+<code class="descclassname">config_dmbrl.</code><code class="descname">ac_cost_fn</code><span class="sig-paren">(</span><em>acs</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.ac_cost_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cost function (action-dependent) used in the optimisation problem.</p>
+<p>Should process both np.arrays and tf.Tensor inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>acs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of actions with shape (<cite>n</cite>, <cite>dU</cite>).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.bnn_constructor">
+<code class="descclassname">config_dmbrl.</code><code class="descname">bnn_constructor</code><span class="sig-paren">(</span><em>model_init_cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.bnn_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the Bayesian Neural Network model.</p>
+<dl class="simple">
+<dt>Moodel_init_cfg is a dotmap object containing:</dt><dd><ul class="simple">
+<li><p>model_in (int): Number of inputs to the model.</p></li>
+<li><p>model_out (int): Number of outputs to the model.</p></li>
+<li><p>n_layers (int): Number of hidden layers.</p></li>
+<li><p>n_neurons (int): Number of neurons per hidden layer.</p></li>
+<li><p>learning_rate (float): Learning rate.</p></li>
+<li><p>wd_in (float): Weight decay for the input layer neurons.</p></li>
+<li><p>wd_hid (float): Weight decay for the hidden layer neurons.</p></li>
+<li><p>wd_out (float): Weight decay for the output layer neurons.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>BNN class object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.create_dmbrl_config">
+<code class="descclassname">config_dmbrl.</code><code class="descname">create_dmbrl_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.create_dmbrl_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the low-level modeling and optimisation configuration parameters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.obs_cost_fn">
+<code class="descclassname">config_dmbrl.</code><code class="descname">obs_cost_fn</code><span class="sig-paren">(</span><em>obs</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.obs_cost_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cost function (state-dependent) used in the optimisation problem.</p>
+<p>Should process both np.arrays and tf.Tensor inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of observations with shape (<cite>n</cite>, <cite>dO</cite>).</p></li>
+<li><p><strong>target</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.obs_postproc">
+<code class="descclassname">config_dmbrl.</code><code class="descname">obs_postproc</code><span class="sig-paren">(</span><em>obs</em>, <em>pred</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.obs_postproc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies observations and model p
+redictions before being passed to cost function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of observations with shape (<cite>n</cite>, <cite>dO</cite>).</p></li>
+<li><p><strong>pred</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of predictions (model outputs) with shape (<cite>n</cite>, <cite>model_output</cite>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.array or tf.Tensor with shape (<cite>n</cite>, <cite>dO</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.obs_preproc">
+<code class="descclassname">config_dmbrl.</code><code class="descname">obs_preproc</code><span class="sig-paren">(</span><em>obs</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.obs_preproc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies observations (in a 2D matrix) before they are passed into the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of observations with shape (<cite>n</cite>, <cite>dO</cite>).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.array or tf.Tensor with shape (<cite>n</cite>, <cite>model_in</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_dmbrl.targ_proc">
+<code class="descclassname">config_dmbrl.</code><code class="descname">targ_proc</code><span class="sig-paren">(</span><em>obs</em>, <em>next_obs</em><span class="sig-paren">)</span><a class="headerlink" href="#config_dmbrl.targ_proc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes current observations and next observations and returns the array of
+targets (so that the model learns the mapping obs -&gt; targ_proc(obs, next_obs))</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of observations at time <cite>t</cite> with shape (<cite>n</cite>, <cite>dO</cite>).</p></li>
+<li><p><strong>next_obs</strong> (<em>np.array</em><em> or </em><em>tf.Tensor</em>) – Array of observations at time <cite>t+1</cite> with shape (<cite>n</cite>, <cite>dO</cite>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.array or tf.Tensor with shape (<cite>n</cite>, <cite>model_out</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

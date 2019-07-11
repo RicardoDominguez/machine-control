@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>aconity &mdash; Aconity Control 0.0 documentation</title>
+  <title>optimizer module &mdash; Aconity Control 0.0 documentation</title>
   
 
   
@@ -134,13 +134,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>aconity</li>
+      <li>optimizer module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_modules/modules.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_modules/optimizer.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -153,14 +153,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="aconity">
-<h1>aconity<a class="headerlink" href="#aconity" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="AconitySTUDIO_client.html">AconitySTUDIO_client module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AconitySTUDIO_utils.html">AconitySTUDIO_utils module</a></li>
-</ul>
-</div>
+  <div class="section" id="module-optimizer">
+<span id="optimizer-module"></span><h1>optimizer module<a class="headerlink" href="#module-optimizer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="optimizer.Optimizer">
+<em class="property">class </em><code class="descclassname">optimizer.</code><code class="descname">Optimizer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.Optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Framework for Optimizer subclasses</p>
+<dl class="method">
+<dt id="optimizer.Optimizer.obtain_solution">
+<code class="descname">obtain_solution</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.Optimizer.obtain_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute optimisation problem solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="optimizer.Optimizer.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.Optimizer.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function iteratively called at MPC.act()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="optimizer.Optimizer.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>cost_function</em>, <em>tf_compatible</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.Optimizer.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called upon initialisation of the MPC class.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

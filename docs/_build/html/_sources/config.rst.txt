@@ -1,6 +1,6 @@
-========
+========================
 Configuration parameters
-========
+========================
 
 The desired configuration for the build is set on the following files:
 
@@ -8,9 +8,9 @@ The desired configuration for the build is set on the following files:
   - `config_dmbrl.py`: Low-level control specific configuration. Generally one would not need to change this file, but rather `config_cluster.py`
   - `config_cluster.py`: Control configuration, divided into 'pretrained' (model trained using data collected previously) and `unfamiliar` (model learned in real-time).
 
------------
+----------------------
 config_windows.py
------------
+----------------------
 
   - LASER_ON (bool): Laser is enabled when True.
   - JOB_NAME (str): Job name as displayed in the AconitySTUDIO web application.
@@ -26,9 +26,9 @@ config_windows.py
   - SLEEP_TIME_READING_FILES (float): Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.
   - PART_DELTA (int): Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).
 
------------
+--------------------------------------------
 config_dmbrl.py and config_cluster.py
------------
+--------------------------------------------
 
   - ctrl_cfg: Configuration parameters for the control algorithm.
 
@@ -82,7 +82,7 @@ config_dmbrl.py and config_cluster.py
       - n_parts_targets: Number of parts to be built for each target
       - targets: Different temperature setpoints to be used (must be of same length as `n_parts_targets`)
       - force: Configuration parameters to periodically overwrite ("force") predefined build parameters
-      
+
           - on: Force functionality enabled if True
           - start_part: First part where functionality is enabled (disregarding the first few ignored parts)
           - n_parts: Number of parts for which the functionality is enabled

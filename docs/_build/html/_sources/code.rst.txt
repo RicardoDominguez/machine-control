@@ -1,17 +1,17 @@
-===========
+======================
 Code documentation
-===========
+======================
 
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
 
-   _modules2/aconity
-   _modules2/machine
-   _modules2/cluster
-   _modules2/controllers
-   _modules2/layers
-   _modules2/misc
-   _modules2/utils
-   _modules2/AconitySTUDIO_client
-   _modules2/AconitySTUDIO_utils
+   _modules/aconity
+   _modules/machine
+   _modules/cluster
+   _modules/controllers
+   _modules/layers
+   _modules/misc
+   _modules/utils
+   _modules/AconitySTUDIO_client
+   _modules/AconitySTUDIO_utils

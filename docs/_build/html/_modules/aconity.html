@@ -34,7 +34,9 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="machine module" href="machine.html" />
+    <link rel="prev" title="Code documentation" href="../code.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,12 +85,23 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing, running and enhancing the software</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../aconityapi.html">Aconity API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html">Code documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code.html">Code documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">aconity module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="machine.html">machine module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster.html">cluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html">controllers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">layers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">misc package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AconitySTUDIO_client.html">AconitySTUDIO_client module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AconitySTUDIO_utils.html">AconitySTUDIO_utils module</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -134,6 +147,8 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
+          <li><a href="../code.html">Code documentation</a> &raquo;</li>
+        
       <li>aconity module</li>
     
     
@@ -153,8 +168,155 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="aconity-module">
-<h1>aconity module<a class="headerlink" href="#aconity-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-aconity">
+<span id="aconity-module"></span><h1>aconity module<a class="headerlink" href="#module-aconity" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="aconity.Aconity">
+<em class="property">class </em><code class="descclassname">aconity.</code><code class="descname">Aconity</code><span class="sig-paren">(</span><em>shared_cfg</em>, <em>aconity_cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Makes use of the API provided by Aconity to automatically start, pause and
+resume a build, and to change individual part parameters in real-time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shared_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>env.n_parts</strong> (<em>int</em>): Number of parts to be built, not including the first <cite>n_ignore</cite> parts, which are often no recorded by the pyrometer.</p></li>
+<li><p><strong>n_ignore</strong> (<em>int</em>): Number of parts built in addition to <cite>n_parts</cite>. Typically, the first 3 parts are not fully recorded by the pyrometer.</p></li>
+<li><p><strong>ctrl_cfg.ac_lb</strong> (<em>array of floats</em>): Lower bounds of the build parameter in the form [speed (m/s), power (W)].</p></li>
+<li><p><strong>ctrl_cfg.ac_ub</strong> (<em>array of floats</em>): Upper bounds of the build parameters in the form [speed (m/s), power (W)].</p></li>
+<li><p><strong>comms</strong> (<em>dotmap</em>): Parameters for communication with other classes.</p></li>
+</ul>
+</p></li>
+<li><p><strong>aconity_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>config_name</strong> (<em>str</em>): Configuration name, i.e. <cite>Unheated 3D Monitoring</cite>.</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>): Job name as displayed in the AconitySTUDIO web application.</p></li>
+<li><p><strong>layers</strong> (<em>array of int</em>): Start and end layers for the build in the form [start_layer, end_layer].</p></li>
+<li><p><strong>fixed_parameters</strong> (<em>np.array, shape N x 2</em>): Parameters used for parts built with fixed parameters.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="aconity.Aconity.getActions">
+<code class="descname">getActions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.getActions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the parameters generated using closed-loop control, copied locally
+from the remote server by the <cite>Machine</cite> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Parameters generated using closed-loop control, with shape (<cite>parts under closed-loop control</cite>, 2)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.initAconity">
+<code class="descname">initAconity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.initAconity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new connection to the AconityMINI using the job name provided.</p>
+<p>The latest session created by the AconityStudio web application is used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.initialParameterSettings">
+<code class="descname">initialParameterSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.initialParameterSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the build parameters for those parts which use fixed parameters throughout the build.</p>
+<p>This parameters are defined in the configuration files rather than being
+passed an input to this function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.loop">
+<code class="descname">loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>While the build is unfinished, iteratively builds layers using the
+provided build parameters.</p>
+<p>The <cite>initAconity()</cite> function must always be called before this function.
+Iterates between reading the build parameters outputted in real-time by
+the cluster, and using these build parameters to build individual layers.</p>
+<p>Allows the class functionality to be conveniently used as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aconity</span> <span class="o">=</span> <span class="n">Aconity</span><span class="p">(</span><span class="n">s_cfg</span><span class="p">,</span> <span class="n">a_cfg</span><span class="p">)</span>
+<span class="n">aconity</span><span class="o">.</span><span class="n">initAconity</span><span class="p">()</span>
+<span class="n">aconity</span><span class="o">.</span><span class="n">loop</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.performLayer">
+<code class="descname">performLayer</code><span class="sig-paren">(</span><em>actions</em><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.performLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a single layer using the specified input parameters.</p>
+<p>Before the layer is started, the relevant parameters are changed according
+to the input array <cite>actions</cite>. Upon the completion of the layer, the build is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>actions</strong> (<em>np.array</em>) – Input parameters to be used for the new layer, with shape (<cite>n_parts</cite>, 2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.pieceNumber">
+<code class="descname">pieceNumber</code><span class="sig-paren">(</span><em>piece_indx</em>, <em>buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.pieceNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>0-&gt;4, 1-&gt;7, 2-&gt;10, etc…</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.signalJobStarted">
+<code class="descname">signalJobStarted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.signalJobStarted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signals the <cite>Machine</cite> class that the job has been stated.</p>
+<p>This is done by creating a folder locally in <cite>comms.dir/comms.state.rdy_name</cite>.</p>
+<p>This prompts the <cite>Machine</cite> class to read and analyse the pyrometer data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aconity.Aconity.uploadConfigFiles">
+<code class="descname">uploadConfigFiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.Aconity.uploadConfigFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="aconity.getExecutionScript">
+<code class="descclassname">aconity.</code><code class="descname">getExecutionScript</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.getExecutionScript" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Aconity execution script, as generated by the AconitySTUDIO web application.</p>
+<p>For instance, the execution script for unheated monitoring is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>layer = function(){
+for(p:$p){
+$m.record_sensor($s[2Pyrometer],p)
+$m.expose(p[next;$h],$c[scanner_1])
+$m.stop_record_sensor($s[2Pyrometer])
+}
+$m.add_layer($g)
+}
+repeat(layer)
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Execution script as generated by the AconitySTUDIO web application.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="aconity.getLoginData">
+<code class="descclassname">aconity.</code><code class="descname">getLoginData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aconity.getLoginData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the login credentials for the Aconity machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary with keys <cite>rest_url</cite>, <cite>ws_url</cite>, <cite>email</cite>, and <cite>password</cite></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -162,6 +324,15 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="machine.html" class="btn btn-neutral float-right" title="machine module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../code.html" class="btn btn-neutral float-left" title="Code documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

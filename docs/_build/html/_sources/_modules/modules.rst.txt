@@ -1,14 +1,8 @@
-doc-copy
-========
+aconity
+=======
 
 .. toctree::
    :maxdepth: 4
 
    AconitySTUDIO_client
    AconitySTUDIO_utils
-   aconity
-   cluster
-   config_cluster
-   config_dmbrl
-   config_windows
-   machine

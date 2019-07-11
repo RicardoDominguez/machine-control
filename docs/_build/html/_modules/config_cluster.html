@@ -153,8 +153,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="config-cluster-module">
-<h1>config_cluster module<a class="headerlink" href="#config-cluster-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-config_cluster">
+<span id="config-cluster-module"></span><h1>config_cluster module<a class="headerlink" href="#module-config_cluster" title="Permalink to this headline">¶</a></h1>
+<p>Defines the control configuration parameters.</p>
+<p>Extensive definition of this parameters are provided in <cite>config_dmbrl.py</cite>.</p>
+<dl class="function">
+<dt id="config_cluster.returnClusterPretrainedCfg">
+<code class="descclassname">config_cluster.</code><code class="descname">returnClusterPretrainedCfg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#config_cluster.returnClusterPretrainedCfg" title="Permalink to this definition">¶</a></dt>
+<dd><p>A pretrained agent makes use solely of a model trained using previously
+collected data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Configuration parameters for control with a method trained on previous data.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dotmap</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="config_cluster.returnClusterUnfamiliarCfg">
+<code class="descclassname">config_cluster.</code><code class="descname">returnClusterUnfamiliarCfg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#config_cluster.returnClusterUnfamiliarCfg" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unfamiliar agent pretrained agent makes use solely of a model trained
+using data collected in real-time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Configuration parameters for control with a method trained in real-time.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dotmap</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
