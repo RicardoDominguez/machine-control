@@ -28,6 +28,8 @@ sys.path.insert(0, os.path.abspath('../dmbrl/modeling/layers'))
 sys.path.insert(0, os.path.abspath('../dmbrl/modeling/models'))
 sys.path.insert(0, os.path.abspath('../dmbrl/modeling/utils'))
 sys.path.insert(0, os.path.abspath('../dmbrl/modeling'))
+sys.path.insert(0, os.path.abspath('../aconityAPI'))
+
 
 # -- General configuration ------------------------------------------------
 

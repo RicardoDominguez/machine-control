@@ -13,5 +13,4 @@ Code documentation
    _modules/layers
    _modules/misc
    _modules/utils
-   _modules/AconitySTUDIO_client
-   _modules/AconitySTUDIO_utils
+   _modules/aconityAPIfiles
