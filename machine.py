@@ -6,29 +6,6 @@ import re
 
 from process.process_main import *
 
-<<<<<<< HEAD
-def pieceNumber(piece_indx, n_ignore):
-    """Returns the index given by AconityStudio to each individual part.
-
-    For instance, if the first part should be ignored, and part numbers increase
-    three by three, then `return int((piece_indx+1)*3+1)` should be used, thus
-    0 -> 4, 1 -> 7, 2 -> 10, etc.
-
-    On the other hand, if the first three parts should be ignored, and part numbers
-    increase one by one, then `return int((piece_indx+3)+1)` should be used, thus
-    0 -> 4, 1 -> 5, 2 -> 6, etc.
-
-    Arguments:
-        piece_indx (int): Input index, starting from 0.
-        n_ignore (int): Number of initial parts that should be ignored.
-
-    Returns:
-        int: Output index as used by AconityStudio.
-    """
-    return int((piece_indx+n_ignore)+1)
-
-=======
->>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190
 class Machine:
     """Reads the raw sensory data outputted by the aconity machine, processes it
     into a low-dimensional state vector and uploads it a remote server for
@@ -60,11 +37,7 @@ class Machine:
 
         self.state_log = None
 
-<<<<<<< HEAD
-        self.n_ignore = shared_cfg.n_ignore + shared_cfg.n_rand + machine_cfg.aconity.open_loop.shape[0]
-=======
         self.n_ignore = shared_cfg.parts_ignored
->>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190
 
     # --------------------------------------------------------------------------
     # COMMS FUNCTIONS
@@ -132,8 +105,23 @@ class Machine:
     # PROCESS FUNCTIONS
     # --------------------------------------------------------------------------
     def pieceNumber(self, piece_indx, buffer):
-        """ 0->4, 1->7, 2->10, etc... """
-        """ 0->2, 1->3, 2->4, etc..."""
+        """Returns the index given by AconityStudio to each individual part.
+
+        For instance, if the first part should be ignored, and part numbers increase
+        three by three, then `return int((piece_indx+1)*3+1)` should be used, thus
+        0 -> 4, 1 -> 7, 2 -> 10, etc.
+
+        On the other hand, if the first three parts should be ignored, and part numbers
+        increase one by one, then `return int((piece_indx+3)+1)` should be used, thus
+        0 -> 4, 1 -> 5, 2 -> 6, etc.
+
+        Arguments:
+            piece_indx (int): Input index, starting from 0.
+            n_ignore (int): Number of initial parts that should be ignored.
+
+        Returns:
+            int: Output index as used by AconityStudio.
+        """
         return int((piece_indx+buffer)*self.m_cfg.aconity.part_delta+1)
 
     def initProcessing(self):
@@ -186,7 +174,6 @@ class Machine:
         print("Data folder found is " + self.data_folder)
 
     def getFileName(self, layer, piece):
-<<<<<<< HEAD
         """Returns the pyrometer data file path for a given layer and part number.
 
         This function accounts for the parts being ignored. The layer thickness
@@ -199,10 +186,7 @@ class Machine:
         Returns:
             str: File path.
         """
-        return self.data_folder+str(pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
-=======
         return self.data_folder+str(self.pieceNumber(piece, self.n_ignore))+'/'+str(np.round(layer*0.03, 2))+'.pcd'
->>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190
 
     def getStates(self):
         """Read the raw data outputted from the pyrometer and processes it into
@@ -250,7 +234,7 @@ class Machine:
                 except:
                     print("Something went wrong reading the data...")
                     pass
-                    
+
             if not self.rectangle_limits_computed[part]:
                 self.square_limits.append(divideSingleSquare(data))
                 print("Square limits found", self.square_limits[-1])
@@ -300,9 +284,6 @@ class Machine:
             states = self.getStates()
             self.sendStates(states)
             self.log(states)
-<<<<<<< HEAD
-=======
-
 
 if __name__ == '__main__':
     from config_windows import returnSharedCfg, returnMachineCfg
@@ -311,4 +292,3 @@ if __name__ == '__main__':
     m_cfg = returnMachineCfg()
     machine = Machine(s_cfg, m_cfg)
     machine.loop()
->>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190

@@ -1,12 +1,57 @@
 """ Low level configuration for modeling and optimisation.
 
-Global variables:
-    - MODEL_IN (int): Number of inputs to the model.
-    - MODEL_OUT (int): Number of outputs of the model.
-    - HOLDOUT_RATIO (float): Percentage of training data used for checking model performance.
-    - CEM_ALPHA (float): Alpha parameter of the CEM optimisation algorithm.
-    - CEM_EPS (float): Epsilon parameter of the CEM optimisation algorithm.
+    - ctrl_cfg: Configuration parameters for the control algorithm.
+        -dO: dimensionality of observations
+        -dU: dimensionality of control inputs
+        - per: How often the action sequence will be optimized, i.e, for per=1 it is reoptimized at every call to `MPC.act()`.
+        - constrains: [[np.array([min v, min q]), np.array([max v, max q])], [min q/v, max q/v], [min q/sqrt(v), max q/sqrt(v)]]
+        - prop_cfg: Configuration parameters for modeling and uncertainty propagation.
+            - model_pretrained: `True` if model used for MPC has been trained on previous data, `False` otherwise.
+            - model_init_cfg: Configuration parameters for model initialisation.
+                - ensemble_size: Number of models within the ensemble.
+                - load_model: `True` for a pretrained model to be loaded upon initialisation.
+                - model_dir: Directory in which the model files (.mat, .nns) are located.
+                - model_name: Name of the model files (model_dir/model_name.mat or model_dir/model_name.nns)
+            - model_train_cfg: Configuration parameters for model training optimisation
+                - batch_size: Batch size.
+                - epochs: Number of training epochs.
+                - hide_progress: If 'True', additional information regarding model training is printed.
+            - npart: Number of particles used for uncertainty propagation.
+            - model_in: Number of inputs to the model.
+            - model_out: Number of outputs to the model.
+            - n_layers: Number of hidden layers.
+            - n_neurons: Number of neurons per hidden layer.
+            - learning_rate: Learning rate.
+            - wd_in: Weight decay for the input layer neurons.
+            - wd_hid: Weight decay for the hidden layer neurons.
+            - wd_out: Weight decay for the output layer neurons.
+        - opt_cfg: Configuration parameters for optimisation.
+            - mode: Uncertainty propagation method.
+            - plan_hor: Planning horizon for the model predictive control algorithm.
+            - cfg
+                - popsize: Number of cost evaluations per iteration.
+                - max_iters: Maximum number of optimisation iterations.
+                - num_elites: Number of elites.
+                - alpha: Alpha parametero of the CEM optimisation algorithm.
+                - eps: Epsilon parameter of the CEM optimisation algorithm.
+            - prop_cfg
+                - mode: Uncertainty propagation method, ie "TSinf"
+        - change_target: True if multiple setpoints used, i.e. 980 and 1010
+        - n_parts_targets: Number of parts to be built for each target
+        - targets: Different temperature setpoints to be used (must be of same length as `n_parts_targets`)
+        - force: Configuration parameters to periodically overwrite ("force") predefined build parameters
+            - on: Force functionality enabled if True
+            - start_part: First part where functionality is enabled (disregarding the first few ignored parts)
+            - n_parts: Number of parts for which the functionality is enabled
+            - n_repeats: Number of consecutive layers for which inputs are forced. For [1,2], n_parts will be forced only once (periodically), while a further n_parts will be forced two times consecutively (periodically)
+            - init_buffer: Initial number of layers for which parameters are not forced
+            - upper_init: Upper bound is initialised to this.
+            - upper_delta: Upper bound increases by this. For instance, for upper_init=105 and upper_delta=5, the upper bound sequence will be 105, 110, 115...
+            - lower_init: Lower bound is initialised to this.
+            - lower_delta: Lower bound is increased by this. For instance, for lower_init=65 and lower_delta=-5, the lower bound sequence will be 60, 55, 50...
+            - fixed_speed: For the forced parameters, power will be adjusted but mark speed will be kept fixed to this value.
 """
+
 from dotmap import DotMap
 import numpy as np
 import tensorflow as tf
@@ -16,7 +61,8 @@ from dmbrl.modeling.layers import FC
 from dmbrl.misc.DotmapUtils import get_required_argument
 
 # Model parameters
-# ------------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+----
 MODEL_IN, MODEL_OUT = 18, 16
 HOLDOUT_RATIO = 0.0
 
@@ -81,7 +127,8 @@ def obs_preproc(obs):
     return obs # Not modified
 
 def obs_postproc(obs, pred):
-    """Modifies observations and model predictions before being passed to cost function.
+    """Modifies observations and model p
+    redictions before being passed to cost function.
 
     Arguments:
         obs (np.array or tf.Tensor): Array of observations with shape (`n`, `dO`).
@@ -103,11 +150,11 @@ def targ_proc(obs, next_obs):
     Returns:
         np.array or tf.Tensor with shape (`n`, `model_out`)
     """
+
     return next_obs - obs
 
 # Cost functions
 # ------------------------------------------------------------------------------
-<<<<<<< HEAD:dmbrl_config.py
 def obs_cost_fn(obs, target):
     """ Cost function (state-dependent) used in the optimisation problem.
 
@@ -120,10 +167,6 @@ def obs_cost_fn(obs, target):
     Returns:
         float
     """
-    target = 980
-=======
-def obs_cost_fn(obs, target):
->>>>>>> 85c52db3870692cc2b998f39ae6e609c5d8c6190:config_dmbrl.py
     k = 1000
     if isinstance(obs, np.ndarray):
         return -np.exp(-np.sum(np.square((obs-target)), axis=-1)/k)
@@ -140,7 +183,21 @@ def ac_cost_fn(acs):
 
     Returns:
         float
-    """
+    """cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 1
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["batch_size"] = 32
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["epochs"] = 5
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["hide_progress"] = False
+
+    cfg.ctrl_cfg.prop_cfg.npart = 20
+
+    cfg.ctrl_cfg.opt_cfg.mode = "CEM"
+    cfg.ctrl_cfg.opt_cfg.plan_hor = 1
+
+    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 500
+    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 10
+    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] =int(500*0.05)
+
+    cfg.ctrl_cfg.prop_cfg.mode = "TS1"
     return 0 # No constrains on actuators
 
 # ------------------------------------------------------------------------------
@@ -186,5 +243,30 @@ def create_dmbrl_config():
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.wd_out = 1.004e-05
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.learning_rate = 3.61e-4
     cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_constructor = bnn_constructor
+
+    cfg.ctrl_cfg.per = 1
+    cfg.ctrl_cfg.prop_cfg.model_pretrained = False
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.load_model = False
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_dir = ''
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.model_name = 'learned_model'
+
+    cfg.ctrl_cfg.prop_cfg.model_init_cfg.num_nets = 5
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["batch_size"] = 32
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["epochs"] = 5
+    cfg.ctrl_cfg.prop_cfg.model_train_cfg["hide_progress"] = False
+
+    cfg.ctrl_cfg.change_target = False
+    cfg.ctrl_cfg.force.on = False
+
+    cfg.ctrl_cfg.prop_cfg.npart = 20
+
+    cfg.ctrl_cfg.opt_cfg.mode = "CEM"
+    cfg.ctrl_cfg.opt_cfg.plan_hor = 1
+
+    cfg.ctrl_cfg.opt_cfg.cfg["popsize"] = 500
+    cfg.ctrl_cfg.opt_cfg.cfg["max_iters"] = 10
+    cfg.ctrl_cfg.opt_cfg.cfg["num_elites"] =int(500*0.05)
+
+    cfg.ctrl_cfg.prop_cfg.mode = "TS1"
 
     return cfg
