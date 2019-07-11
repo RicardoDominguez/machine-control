@@ -68,6 +68,7 @@ class MPC(Controller):
                     and returns the array of targets (so that the model learns the mapping
                     obs -> targ_proc(obs, next_obs)). Defaults to lambda obs, next_obs: next_obs.
                     Note: Only needs to process NumPy arrays.
+
             .opt_cfg
                 .mode (str):
                     Internal optimizer that will be used. Choose between [CEM, Random].
@@ -84,6 +85,7 @@ class MPC(Controller):
                     An array with the optimisation constrains = [[lb, ub], [lc1, uc1], [lc2, uc2]]
                     so that if u = [v, q], lb <= u <= ub, lc1 <= q/v <= uc2, lc2 <= q/sqrt(v) <= uc2.
                     Overwrites ac_lb and ac_ub is constrains[0] is not None.
+
             .log_cfg
                 .save_all_models (bool): (optional)
                     If True, saves models at every iteration.

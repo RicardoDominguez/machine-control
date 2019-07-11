@@ -59,9 +59,8 @@ def returnSharedCfg():
             - ac_lb: Lower bounds of the build parameter in the form [speed (m/s), power (W)].
     """
     cfg = DotMap()
-Scan speed used for parts being "ignored".
     cfg.comms.dir = 'io/'
-    cfg.comms.action.rdy_name = 'action_rdy' Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).
+    cfg.comms.action.rdy_name = 'action_rdy' # Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).
     cfg.comms.action.f_name = 'actions.npy'
     cfg.comms.state.rdy_name = 'state_rdy'
     cfg.comms.state.f_name = 'states.npy'
