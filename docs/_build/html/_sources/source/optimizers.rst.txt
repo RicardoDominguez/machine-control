@@ -1,0 +1,38 @@
+optimizers package
+==================
+
+Submodules
+----------
+
+optimizers.cem module
+---------------------
+
+.. automodule:: optimizers.cem
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+optimizers.optimizer module
+---------------------------
+
+.. automodule:: optimizers.optimizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+optimizers.random module
+------------------------
+
+.. automodule:: optimizers.random
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: optimizers
+    :members:
+    :undoc-members:
+    :show-inheritance:

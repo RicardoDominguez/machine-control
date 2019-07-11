@@ -1,0 +1,258 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{AconitySTUDIO\_client}\spxextra{class in AconitySTUDIO\_client}, \hyperpage{23}
+  \item \spxentry{AconitySTUDIO\_client}\spxextra{module}, \hyperpage{23}
+  \item \spxentry{AconitySTUDIO\_utils}\spxextra{module}, \hyperpage{29}
+  \item \spxentry{act()}\spxextra{controllers.Controller.Controller method}, \hyperpage{14}
+  \item \spxentry{act()}\spxextra{controllers.MPC.MPC method}, \hyperpage{15}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{cache()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{22}
+  \item \spxentry{CEMOptimizer}\spxextra{class in misc.optimizers.cem}, \hyperpage{19}
+  \item \spxentry{change\_global\_parameter()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{23}
+  \item \spxentry{change\_global\_parameter()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{change\_part\_parameter()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{23}
+  \item \spxentry{change\_part\_parameter()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{changePlanHor()}\spxextra{controllers.MPC.MPC method}, \hyperpage{16}
+  \item \spxentry{changeSolDim()}\spxextra{misc.optimizers.cem.CEMOptimizer method}, \hyperpage{19}
+  \item \spxentry{changeTargetCost()}\spxextra{controllers.MPC.MPC method}, \hyperpage{16}
+  \item \spxentry{clearComms()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{Cluster}\spxextra{class in cluster}, \hyperpage{12}
+  \item \spxentry{cluster}\spxextra{module}, \hyperpage{12}
+  \item \spxentry{compute\_output\_tensor()}\spxextra{layers.FC.FC method}, \hyperpage{17}
+  \item \spxentry{computeAction()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{config\_exists()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{24}
+  \item \spxentry{config\_has\_component()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{24}
+  \item \spxentry{config\_state()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{24}
+  \item \spxentry{construct\_vars()}\spxextra{layers.FC.FC method}, \hyperpage{17}
+  \item \spxentry{Controller}\spxextra{class in controllers.Controller}, \hyperpage{14}
+  \item \spxentry{controllers}\spxextra{module}, \hyperpage{17}
+  \item \spxentry{controllers.Controller}\spxextra{module}, \hyperpage{14}
+  \item \spxentry{controllers.MPC}\spxextra{module}, \hyperpage{14}
+  \item \spxentry{convert\_to\_string()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{copy()}\spxextra{layers.FC.FC method}, \hyperpage{17}
+  \item \spxentry{create()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client class method}, 
+		\hyperpage{24}
+  \item \spxentry{create\_addParts()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{create\_init\_resume\_script()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{create\_init\_script()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{create\_laser\_beam\_sources()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{create\_preStartParams()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{create\_preStartSelection()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{customTime()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{29}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{download\_chunkwise()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+  \item \spxentry{dump\_logs()}\spxextra{controllers.Controller.Controller method}, \hyperpage{14}
+  \item \spxentry{dump\_logs()}\spxextra{controllers.MPC.MPC method}, \hyperpage{16}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{enable\_pymongo\_database()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+  \item \spxentry{execute()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{FC}\spxextra{class in layers.FC}, \hyperpage{17}
+  \item \spxentry{filter\_out\_keys()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{29}
+  \item \spxentry{fit()}\spxextra{utils.ModelScaler.ModelScaler method}, \hyperpage{21}
+  \item \spxentry{fit()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{22}
+  \item \spxentry{fit()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler1D method}, 
+		\hyperpage{23}
+  \item \spxentry{fix\_ws\_msg()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{29}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{get()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+  \item \spxentry{get\_activation()}\spxextra{layers.FC.FC method}, \hyperpage{17}
+  \item \spxentry{get\_adress()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{29}
+  \item \spxentry{get\_config\_id()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+  \item \spxentry{get\_decays()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_ensemble\_size()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_input\_dim()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_job\_id()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{25}
+  \item \spxentry{get\_lasers()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{get\_lasers()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, \hyperpage{29}
+  \item \spxentry{get\_lasers\_off\_cmds()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{get\_last\_built\_layer()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{get\_machine\_id()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{get\_mapping\_parts\_to\_index()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, 
+		\hyperpage{29}
+  \item \spxentry{get\_output\_dim()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_required\_argument()}\spxextra{in module misc.DotmapUtils}, \hyperpage{21}
+  \item \spxentry{get\_session\_id()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{get\_time\_string()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{29}
+  \item \spxentry{get\_vars()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_vars()}\spxextra{utils.ModelScaler.ModelScaler method}, \hyperpage{21}
+  \item \spxentry{get\_vars()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{22}
+  \item \spxentry{get\_weight\_decay()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{get\_workunit\_and\_channel\_id()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{getActions()}\spxextra{machine.Machine method}, \hyperpage{11}
+  \item \spxentry{getFileName()}\spxextra{machine.Machine method}, \hyperpage{11}
+  \item \spxentry{getStates()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{getStates()}\spxextra{machine.Machine method}, \hyperpage{12}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{initAction()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{initProcessing()}\spxextra{machine.Machine method}, \hyperpage{12}
+  \item \spxentry{inverse\_transform()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{22}
+  \item \spxentry{inverse\_transformInput()}\spxextra{utils.ModelScaler.ModelScaler method}, 
+		\hyperpage{21}
+  \item \spxentry{inverse\_transformOutput()}\spxextra{utils.ModelScaler.ModelScaler method}, 
+		\hyperpage{22}
+
+  \indexspace
+  \bigletter J
+  \item \spxentry{JobHandler}\spxextra{class in AconitySTUDIO\_utils}, \hyperpage{29}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{layers}\spxextra{module}, \hyperpage{19}
+  \item \spxentry{layers.FC}\spxextra{module}, \hyperpage{17}
+  \item \spxentry{load\_cache()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{23}
+  \item \spxentry{log()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{log()}\spxextra{machine.Machine method}, \hyperpage{12}
+  \item \spxentry{log\_setup()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{30}
+  \item \spxentry{loop()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{loop()}\spxextra{machine.Machine method}, \hyperpage{12}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{Machine}\spxextra{class in machine}, \hyperpage{11}
+  \item \spxentry{machine}\spxextra{module}, \hyperpage{11}
+  \item \spxentry{misc}\spxextra{module}, \hyperpage{21}
+  \item \spxentry{misc.DotmapUtils}\spxextra{module}, \hyperpage{21}
+  \item \spxentry{misc.optimizers}\spxextra{module}, \hyperpage{21}
+  \item \spxentry{misc.optimizers.cem}\spxextra{module}, \hyperpage{19}
+  \item \spxentry{misc.optimizers.optimizer}\spxextra{module}, \hyperpage{20}
+  \item \spxentry{misc.optimizers.random}\spxextra{module}, \hyperpage{20}
+  \item \spxentry{ModelScaler}\spxextra{class in utils.ModelScaler}, \hyperpage{21}
+  \item \spxentry{MPC}\spxextra{class in controllers.MPC}, \hyperpage{14}
+
+  \indexspace
+  \bigletter O
+  \item \spxentry{obtain\_solution()}\spxextra{misc.optimizers.cem.CEMOptimizer method}, 
+		\hyperpage{19}
+  \item \spxentry{obtain\_solution()}\spxextra{misc.optimizers.optimizer.Optimizer method}, 
+		\hyperpage{20}
+  \item \spxentry{obtain\_solution()}\spxextra{misc.optimizers.random.RandomOptimizer method}, 
+		\hyperpage{20}
+  \item \spxentry{Optimizer}\spxextra{class in misc.optimizers.optimizer}, \hyperpage{20}
+  \item \spxentry{optimizers}\spxextra{controllers.MPC.MPC attribute}, \hyperpage{16}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{pause\_job()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{pieceNumber()}\spxextra{machine.Machine method}, \hyperpage{12}
+  \item \spxentry{post()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{26}
+  \item \spxentry{post\_script()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{27}
+  \item \spxentry{put()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{27}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{RandomOptimizer}\spxextra{class in misc.optimizers.random}, \hyperpage{20}
+  \item \spxentry{reset()}\spxextra{controllers.Controller.Controller method}, \hyperpage{14}
+  \item \spxentry{reset()}\spxextra{controllers.MPC.MPC method}, \hyperpage{16}
+  \item \spxentry{reset()}\spxextra{misc.optimizers.cem.CEMOptimizer method}, \hyperpage{20}
+  \item \spxentry{reset()}\spxextra{misc.optimizers.optimizer.Optimizer method}, \hyperpage{20}
+  \item \spxentry{reset()}\spxextra{misc.optimizers.random.RandomOptimizer method}, \hyperpage{21}
+  \item \spxentry{restart\_config()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{27}
+  \item \spxentry{resume\_job()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{27}
+  \item \spxentry{resume\_script()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{save\_data\_to\_pymongo\_db()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+  \item \spxentry{sendAction()}\spxextra{cluster.Cluster method}, \hyperpage{13}
+  \item \spxentry{sendStates()}\spxextra{machine.Machine method}, \hyperpage{12}
+  \item \spxentry{set()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, \hyperpage{29}
+  \item \spxentry{set\_activation()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{set\_ensemble\_size()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{set\_input\_dim()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{set\_output\_dim()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{set\_weight\_decay()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{setup()}\spxextra{misc.optimizers.cem.CEMOptimizer method}, \hyperpage{20}
+  \item \spxentry{setup()}\spxextra{misc.optimizers.optimizer.Optimizer method}, \hyperpage{20}
+  \item \spxentry{setup()}\spxextra{misc.optimizers.random.RandomOptimizer method}, \hyperpage{21}
+  \item \spxentry{start\_job()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+  \item \spxentry{stop\_channel()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+  \item \spxentry{stop\_job()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+  \item \spxentry{subscribe\_report()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+  \item \spxentry{subscribe\_topic()}\spxextra{AconitySTUDIO\_client.AconitySTUDIO\_client method}, 
+		\hyperpage{28}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{TensorStandardScaler}\spxextra{class in utils.TensorStandardScaler}, 
+		\hyperpage{22}
+  \item \spxentry{TensorStandardScaler1D}\spxextra{class in utils.TensorStandardScaler}, 
+		\hyperpage{23}
+  \item \spxentry{to\_json()}\spxextra{AconitySTUDIO\_utils.JobHandler method}, \hyperpage{29}
+  \item \spxentry{track\_layer\_number()}\spxextra{in module AconitySTUDIO\_utils}, \hyperpage{30}
+  \item \spxentry{train()}\spxextra{controllers.Controller.Controller method}, \hyperpage{14}
+  \item \spxentry{train()}\spxextra{controllers.MPC.MPC method}, \hyperpage{16}
+  \item \spxentry{transform()}\spxextra{utils.TensorStandardScaler.TensorStandardScaler method}, 
+		\hyperpage{23}
+  \item \spxentry{transformInput()}\spxextra{utils.ModelScaler.ModelScaler method}, \hyperpage{22}
+  \item \spxentry{transformTarget()}\spxextra{utils.ModelScaler.ModelScaler method}, \hyperpage{22}
+
+  \indexspace
+  \bigletter U
+  \item \spxentry{unset\_activation()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{unset\_weight\_decay()}\spxextra{layers.FC.FC method}, \hyperpage{18}
+  \item \spxentry{utils}\spxextra{module}, \hyperpage{23}
+  \item \spxentry{utils.ModelScaler}\spxextra{module}, \hyperpage{21}
+  \item \spxentry{utils.TensorStandardScaler}\spxextra{module}, \hyperpage{22}
+
+\end{sphinxtheindex}

@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration parameters &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Aconity API" href="aconityapi.html" />
+    <link rel="prev" title="Installing, running and enhancing the software" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing, running and enhancing the software</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#config-windows-py">config_windows.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-dmbrl-py-and-config-cluster-py">config_dmbrl.py and config_cluster.py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aconityapi.html">Aconity API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration parameters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration-parameters">
+<h1>Configuration parameters<a class="headerlink" href="#configuration-parameters" title="Permalink to this headline">¶</a></h1>
+<p>The desired configuration for the build is set on the following files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>config_windows.py</cite>: General configuration parameters concerning the build, such as number of parts, build parameters, …</p></li>
+<li><p><cite>config_dmbrl.py</cite>: Low-level control specific configuration. Generally one would not need to change this file, but rather <cite>config_cluster.py</cite></p></li>
+<li><p><cite>config_cluster.py</cite>: Control configuration, divided into ‘pretrained’ (model trained using data collected previously) and <cite>unfamiliar</cite> (model learned in real-time).</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="config-windows-py">
+<h2>config_windows.py<a class="headerlink" href="#config-windows-py" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>LASER_ON (bool): Laser is enabled when True.</p></li>
+<li><p>JOB_NAME (str): Job name as displayed in the AconitySTUDIO web application.</p></li>
+<li><p>LAYERS (array of int): Layer range to be built, as [layer_min, layer_max].</p></li>
+<li><p>N_PARTS (int): Number of parts to be built (not regarding ignored parts).</p></li>
+<li><p>N_STATES (int): Number of low-dimensional states used for the processing of the raw pyrometer data.</p></li>
+<li><p>TEMPERATURE_TARGET (float): Temperature target in mV.</p></li>
+<li><p>N_PARTS_IGNORED (int): Number of additional parts to be built on top of <cite>N_PARTS</cite> (pyrometer may not record data for the first few parts).</p></li>
+<li><p>IGNORED_PARTS_SPEED (float): Scan speed used for parts being “ignored”.</p></li>
+<li><p>IGNORED_PARTS_POWER (float): Laser power used for parts being “ignored”.</p></li>
+<li><p>N_PARTS_FIXED_PARAMS (int): Number of parts built using fixed build parameters.</p></li>
+<li><p>FIXED_PARAMS (array): Parameters to be used for those parts being built with fixed build parameters, as [speed (m/s), power (W)]</p></li>
+<li><p>SLEEP_TIME_READING_FILES (float): Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.</p></li>
+<li><p>PART_DELTA (int): Parts of interest may increase 1 by 1, or 3 by 3 (refer to the AconitySTUDIO web application).</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="config-dmbrl-py-and-config-cluster-py">
+<h2>config_dmbrl.py and config_cluster.py<a class="headerlink" href="#config-dmbrl-py-and-config-cluster-py" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p>ctrl_cfg: Configuration parameters for the control algorithm.</p>
+<blockquote>
+<div><p>-dO: dimensionality of observations
+-dU: dimensionality of control inputs
+- per: How often the action sequence will be optimized, i.e, for per=1 it is reoptimized at every call to <cite>MPC.act()</cite>.
+- constrains: [[np.array([min v, min q]), np.array([max v, max q])], [min q/v, max q/v], [min q/sqrt(v), max q/sqrt(v)]]
+- prop_cfg: Configuration parameters for modeling and uncertainty propagation.</p>
+<blockquote>
+<div><ul>
+<li><p>model_pretrained: <cite>True</cite> if model used for MPC has been trained on previous data, <cite>False</cite> otherwise.</p></li>
+<li><p>model_init_cfg: Configuration parameters for model initialisation.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ensemble_size: Number of models within the ensemble.</p></li>
+<li><p>load_model: <cite>True</cite> for a pretrained model to be loaded upon initialisation.</p></li>
+<li><p>model_dir: Directory in which the model files (.mat, .nns) are located.</p></li>
+<li><p>model_name: Name of the model files (model_dir/model_name.mat or model_dir/model_name.nns)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>model_train_cfg: Configuration parameters for model training optimisation</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>batch_size: Batch size.</p></li>
+<li><p>epochs: Number of training epochs.</p></li>
+<li><p>hide_progress: If ‘True’, additional information regarding model training is printed.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>npart: Number of particles used for uncertainty propagation.</p></li>
+<li><p>model_in: Number of inputs to the model.</p></li>
+<li><p>model_out: Number of outputs to the model.</p></li>
+<li><p>n_layers: Number of hidden layers.</p></li>
+<li><p>n_neurons: Number of neurons per hidden layer.</p></li>
+<li><p>learning_rate: Learning rate.</p></li>
+<li><p>wd_in: Weight decay for the input layer neurons.</p></li>
+<li><p>wd_hid: Weight decay for the hidden layer neurons.</p></li>
+<li><p>wd_out: Weight decay for the output layer neurons.</p></li>
+</ul>
+</div></blockquote>
+<ul>
+<li><p>opt_cfg: Configuration parameters for optimisation.</p>
+<blockquote>
+<div><ul>
+<li><p>mode: Uncertainty propagation method.</p></li>
+<li><p>plan_hor: Planning horizon for the model predictive control algorithm.</p></li>
+<li><p>cfg</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>popsize: Number of cost evaluations per iteration.</p></li>
+<li><p>max_iters: Maximum number of optimisation iterations.</p></li>
+<li><p>num_elites: Number of elites.</p></li>
+<li><p>alpha: Alpha parametero of the CEM optimisation algorithm.</p></li>
+<li><p>eps: Epsilon parameter of the CEM optimisation algorithm.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>prop_cfg</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>mode: Uncertainty propagation method, ie “TSinf”</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>change_target: True if multiple setpoints used, i.e. 980 and 1010</p></li>
+<li><p>n_parts_targets: Number of parts to be built for each target</p></li>
+<li><p>targets: Different temperature setpoints to be used (must be of same length as <cite>n_parts_targets</cite>)</p></li>
+<li><p>force: Configuration parameters to periodically overwrite (“force”) predefined build parameters</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>on: Force functionality enabled if True</p></li>
+<li><p>start_part: First part where functionality is enabled (disregarding the first few ignored parts)</p></li>
+<li><p>n_parts: Number of parts for which the functionality is enabled</p></li>
+<li><p>n_repeats: Number of consecutive layers for which inputs are forced. For [1,2], n_parts will be forced only once (periodically), while a further n_parts will be forced two times consecutively (periodically)</p></li>
+<li><p>init_buffer: Initial number of layers for which parameters are not forced</p></li>
+<li><p>upper_init: Upper bound is initialised to this.</p></li>
+<li><p>upper_delta: Upper bound increases by this. For instance, for upper_init=105 and upper_delta=5, the upper bound sequence will be 105, 110, 115…</p></li>
+<li><p>lower_init: Lower bound is initialised to this.</p></li>
+<li><p>lower_delta: Lower bound is increased by this. For instance, for lower_init=65 and lower_delta=-5, the lower bound sequence will be 60, 55, 50…</p></li>
+<li><p>fixed_speed: For the forced parameters, power will be adjusted but mark speed will be kept fixed to this value.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="aconityapi.html" class="btn btn-neutral float-right" title="Aconity API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installing, running and enhancing the software" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

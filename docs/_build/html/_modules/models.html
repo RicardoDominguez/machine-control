@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>models package &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing, running and enhancing the software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aconityapi.html">Aconity API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Code documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>models package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_modules/models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="models-package">
+<h1>models package<a class="headerlink" href="#models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-models.BNN">
+<span id="models-bnn-module"></span><h2>models.BNN module<a class="headerlink" href="#module-models.BNN" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.BNN.BNN">
+<em class="property">class </em><code class="descclassname">models.BNN.</code><code class="descname">BNN</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Neural network models which model aleatoric uncertainty (and possibly epistemic uncertainty
+with ensembling).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>DotMap</em>) – <p>A dotmap of model parameters.
+.name (str):</p>
+<blockquote>
+<div><p>Model name, used for logging/use in variable scopes.
+Warning: Models with the same name will overwrite each other.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>.num_networks (int): (optional)</dt><dd><p>The number of networks in the ensemble. Defaults to 1.
+Ignored if model is being loaded.</p>
+</dd>
+<dt>.model_dir (str/None): (optional)</dt><dd><p>Path to directory from which model will be loaded, and saved by default. Defaults to None.</p>
+</dd>
+<dt>.load_model (bxool): (optional)</dt><dd><p>If True, model will be loaded from the model directory, assuming
+that the files are generated by a model of the same name. Defaults to False.</p>
+</dd>
+<dt>.sess (tf.Session/None):</dt><dd><p>The session that this model will use. If None, creates a session
+with its own associated graph. Defaults to None.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="models.BNN.BNN.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new layer to the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>layer</strong> – (layer) The new layer to be added to the network.
+If this is the first layer, the input dimension of the layer must be set.</p>
+</dd>
+</dl>
+<p>Returns: None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.create_prediction_tensors">
+<code class="descname">create_prediction_tensors</code><span class="sig-paren">(</span><em>inputs</em>, <em>factored=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.create_prediction_tensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>See predict() for documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>optimizer_args=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalizes the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimizer</strong> – (tf.train.Optimizer) An optimizer class from those available at tf.train.Optimizer.</p></li>
+<li><p><strong>optimizer_args</strong> – (dict) A dictionary of arguments for the __init__ method of the chosen optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: None</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="models.BNN.BNN.is_probabilistic">
+<code class="descname">is_probabilistic</code><a class="headerlink" href="#models.BNN.BNN.is_probabilistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="models.BNN.BNN.is_tf_model">
+<code class="descname">is_tf_model</code><a class="headerlink" href="#models.BNN.BNN.is_tf_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes and returns the most recently added layer to the network.</p>
+<p>Returns: (layer) The removed layer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>inputs</em>, <em>factored=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the distribution predicted by the model for each input vector in inputs.
+Behavior is affected by the dimensionality of inputs and factored as follows:</p>
+<dl class="simple">
+<dt>inputs is 2D, factored=True:</dt><dd><p>Each row is treated as an input vector.
+Returns a mean of shape [ensemble_size, batch_size, output_dim] and variance of shape
+[ensemble_size, batch_size, output_dim], where N(mean[i, j, :], diag([i, j, :])) is the
+predicted output distribution by the ith model in the ensemble on input vector j.</p>
+</dd>
+<dt>inputs is 2D, factored=False:</dt><dd><p>Each row is treated as an input vector.
+Returns a mean of shape [batch_size, output_dim] and variance of shape
+[batch_size, output_dim], where aggregation is performed as described in the paper.</p>
+</dd>
+<dt>inputs is 3D, factored=True/False:</dt><dd><p>Each row in the last dimension is treated as an input vector.
+Returns a mean of shape [ensemble_size, batch_size, output_dim] and variance of sha
+[ensemble_size, batch_size, output_dim], where N(mean[i, j, :], diag([i, j, :])) is the
+predicted output distribution by the ith model in the ensemble on input vector [i, j].</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>np.ndarray</em>) – An array of input vectors in rows. See above for behavior.</p></li>
+<li><p><strong>factored</strong> (<em>bool</em>) – See above for behavior.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>savedir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves all information required to recreate this model in two files in savedir
+(or self.model_dir if savedir is None), one containing the model structure and the other
+containing all variables in the network.</p>
+<p>savedir (str, Optional): Path to which files will be saved. If not provided, self.model_dir (the directory provided at initialization) will be used.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="models.BNN.BNN.sess">
+<code class="descname">sess</code><a class="headerlink" href="#models.BNN.BNN.sess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the TensorFlow session used by this class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.BNN.BNN.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>inputs</em>, <em>targets</em>, <em>batch_size=32</em>, <em>epochs=100</em>, <em>hide_progress=False</em>, <em>holdout_ratio=0.0</em>, <em>max_logging=5000</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.BNN.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains/Continues network training</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>np.ndarray</em>) – Network inputs in the training dataset in rows.</p></li>
+<li><p><strong>targets</strong> (<em>np.ndarray</em>) – Network target outputs in the training dataset in rows corresponding to the rows in inputs.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – The minibatch size to be used for training.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em>) – Number of epochs (full network passes that will be done.</p></li>
+<li><p><strong>hide_progress</strong> (<em>bool</em>) – If True, hides the progress bar shown at the beginning of training.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: None</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="models.BNN.loadPickle">
+<code class="descclassname">models.BNN.</code><code class="descname">loadPickle</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.loadPickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads and returns a pickled object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Path to pickled object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pickled object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="models.BNN.savePickle">
+<code class="descclassname">models.BNN.</code><code class="descname">savePickle</code><span class="sig-paren">(</span><em>name</em>, <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#models.BNN.savePickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a picked object to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Path to file.</p></li>
+<li><p><strong>data</strong> – Object to be pickled.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-models" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

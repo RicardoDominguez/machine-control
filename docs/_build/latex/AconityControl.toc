@@ -1,0 +1,51 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Overview}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Program flow}{1}{section.1.1}
+\contentsline {chapter}{\numberline {2}Installing, running and enhancing the software}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}Installing required dependencies}{2}{section.2.1}
+\contentsline {section}{\numberline {2.2}Running the software}{2}{section.2.2}
+\contentsline {section}{\numberline {2.3}Enhancing the software}{3}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Adding another sensor}{3}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}Dividing a part into multiple \IeC {\textquotedblleft }subparts\IeC {\textquotedblright }}{4}{subsection.2.3.2}
+\contentsline {chapter}{\numberline {3}Configuration parameters}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}config\_windows.py}{5}{section.3.1}
+\contentsline {section}{\numberline {3.2}config\_dmbrl.py and config\_cluster.py}{6}{section.3.2}
+\contentsline {chapter}{\numberline {4}Aconity API}{8}{chapter.4}
+\contentsline {section}{\numberline {4.1}Creating and configuring the client}{8}{section.4.1}
+\contentsline {section}{\numberline {4.2}Script execution}{8}{section.4.2}
+\contentsline {section}{\numberline {4.3}Job management}{9}{section.4.3}
+\contentsline {section}{\numberline {4.4}How pyrometer data is saved}{9}{section.4.4}
+\contentsline {chapter}{\numberline {5}Code documentation}{11}{chapter.5}
+\contentsline {section}{\numberline {5.1}aconity module}{11}{section.5.1}
+\contentsline {section}{\numberline {5.2}machine module}{11}{section.5.2}
+\contentsline {section}{\numberline {5.3}cluster module}{12}{section.5.3}
+\contentsline {section}{\numberline {5.4}controllers package}{14}{section.5.4}
+\contentsline {subsection}{\numberline {5.4.1}Submodules}{14}{subsection.5.4.1}
+\contentsline {subsection}{\numberline {5.4.2}controllers.Controller module}{14}{subsection.5.4.2}
+\contentsline {subsection}{\numberline {5.4.3}controllers.MPC module}{14}{subsection.5.4.3}
+\contentsline {subsection}{\numberline {5.4.4}Module contents}{17}{subsection.5.4.4}
+\contentsline {section}{\numberline {5.5}layers package}{17}{section.5.5}
+\contentsline {subsection}{\numberline {5.5.1}Submodules}{17}{subsection.5.5.1}
+\contentsline {subsection}{\numberline {5.5.2}layers.FC module}{17}{subsection.5.5.2}
+\contentsline {subsection}{\numberline {5.5.3}Module contents}{19}{subsection.5.5.3}
+\contentsline {section}{\numberline {5.6}misc package}{19}{section.5.6}
+\contentsline {subsection}{\numberline {5.6.1}Subpackages}{19}{subsection.5.6.1}
+\contentsline {subsubsection}{misc.optimizers package}{19}{subsubsection*.51}
+\contentsline {paragraph}{Submodules}{19}{paragraph*.52}
+\contentsline {paragraph}{misc.optimizers.cem module}{19}{paragraph*.53}
+\contentsline {paragraph}{misc.optimizers.optimizer module}{20}{paragraph*.59}
+\contentsline {paragraph}{misc.optimizers.random module}{20}{paragraph*.64}
+\contentsline {paragraph}{Module contents}{21}{paragraph*.69}
+\contentsline {subsection}{\numberline {5.6.2}Submodules}{21}{subsection.5.6.2}
+\contentsline {subsection}{\numberline {5.6.3}misc.DotmapUtils module}{21}{subsection.5.6.3}
+\contentsline {subsection}{\numberline {5.6.4}Module contents}{21}{subsection.5.6.4}
+\contentsline {section}{\numberline {5.7}utils package}{21}{section.5.7}
+\contentsline {subsection}{\numberline {5.7.1}Submodules}{21}{subsection.5.7.1}
+\contentsline {subsection}{\numberline {5.7.2}utils.ModelScaler module}{21}{subsection.5.7.2}
+\contentsline {subsection}{\numberline {5.7.3}utils.TensorStandardScaler module}{22}{subsection.5.7.3}
+\contentsline {subsection}{\numberline {5.7.4}Module contents}{23}{subsection.5.7.4}
+\contentsline {section}{\numberline {5.8}AconitySTUDIO\_client module}{23}{section.5.8}
+\contentsline {section}{\numberline {5.9}AconitySTUDIO\_utils module}{29}{section.5.9}
+\contentsline {chapter}{\numberline {6}Indices and tables}{31}{chapter.6}
+\contentsline {chapter}{Python Module Index}{32}{section*.140}
+\contentsline {chapter}{Index}{33}{section*.141}

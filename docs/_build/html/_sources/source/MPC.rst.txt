@@ -1,0 +1,7 @@
+MPC module
+==========
+
+.. automodule:: MPC
+    :members:
+    :undoc-members:
+    :show-inheritance:

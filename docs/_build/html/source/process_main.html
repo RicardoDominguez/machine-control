@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>process_main module &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">process_main module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>process_main module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/process_main.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-process_main">
+<span id="process-main-module"></span><h1>process_main module<a class="headerlink" href="#module-process_main" title="Permalink to this headline">¶</a></h1>
+<p>Implements functions for the processing of raw pyrometer data.</p>
+<dl class="function">
+<dt id="process_main.divideDataRectangleLimits">
+<code class="descclassname">process_main.</code><code class="descname">divideDataRectangleLimits</code><span class="sig-paren">(</span><em>data</em>, <em>square_limits</em>, <em>returnMode=1</em>, <em>plot=False</em>, <em>saveName=None</em>, <em>saveDir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.divideDataRectangleLimits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list with the data for a square given its limits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.array</em>) – Raw pyrometer data with shape (<cite>n</cite>, 3)</p></li>
+<li><p><strong>square_limits</strong> (<em>np.array</em>) – Limits of the square with shape (4,)</p></li>
+<li><p><strong>returnMode</strong> (<em>int</em><em>, </em><em>optional</em>) – Determines what parameters will be returned.</p></li>
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, produces a plot of the data distribution and cutoff value.</p></li>
+<li><p><strong>saveName</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of file where the image is to be saved.</p></li>
+<li><p><strong>saveDir</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of directory where the image is to be saved.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Output modes:</dt><dd><ul class="simple">
+<li><p>1: only data within limits</p></li>
+<li><p>2: data within limits, data outside of limits</p></li>
+<li><p>3: data within limits, ratio of data outside limits / total data</p></li>
+<li><p>4: data, ratio of data deleted, error flag</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="process_main.divideSingleSquare">
+<code class="descclassname">process_main.</code><code class="descname">divideSingleSquare</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.divideSingleSquare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides the input data into a single square.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>np.array</em>) – Raw pyrometer data with shape (<cite>n</cite>, 3)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Square limits as [xmin, xmax, ymin, ymax] with shape (4,)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="process_main.loadData">
+<code class="descclassname">process_main.</code><code class="descname">loadData</code><span class="sig-paren">(</span><em>file_name</em>, <em>timeit=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.loadData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load data from a pyrometer file into a np.array.</p>
+<p>The pyrometer .pcb file has structure [X, Y, mV, mV].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – Path to file.</p></li>
+<li><p><strong>timeit</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns the time taken the read the file.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints to screen additional information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Data loaded from the .pcb file, with shape (<cite>n</cite>, 3)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="process_main.pieceStateMeans">
+<code class="descclassname">process_main.</code><code class="descname">pieceStateMeans</code><span class="sig-paren">(</span><em>piece_data</em>, <em>piece_limits=None</em>, <em>n_splits=None</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.pieceStateMeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the raw data of a single piece into a low-dimensional state vector
+by dividing the piece into regions (squares) and taking the mean of the
+temperature within that square.</p>
+<p>If a particular square has no data points, then average contigous states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>piece_data</strong> (<em>np.array</em>) – Part data with shape (<cite>n</cite>, 3)</p></li>
+<li><p><strong>piece_limits</strong> (<em>np.array</em><em>, </em><em>optional</em>) – Limits of the rectangular part as [xmin, xmax, ymin, ymax]</p></li>
+<li><p><strong>n_splits</strong> (<em>int</em><em>, </em><em>optional</em>) – Divided into n_splits*n_splits regions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>State vector with shape (<cite>n_splits*n_splits</cite>,)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="process_main.plotTemperaturesState">
+<code class="descclassname">process_main.</code><code class="descname">plotTemperaturesState</code><span class="sig-paren">(</span><em>states</em>, <em>vlimits=None</em>, <em>ax=None</em>, <em>saveFig=None</em>, <em>fig=None</em>, <em>title=None</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.plotTemperaturesState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the temperature in each of the regions comprising the low-dimensional states</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> (<em>np.array</em>) – State vector with shape (<cite>nS</cite>,)</p></li>
+<li><p><strong>vlimits</strong> (<em>np.array</em><em>, </em><em>optional</em>) – Temperature limits as [vmin, vmax]</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.Axes</em><em>, </em><em>optional</em>) – Produce plot within a subplot environment.</p></li>
+<li><p><strong>saveFig</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of file to save the image.</p></li>
+<li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em><em>, </em><em>optional</em>) – Figure to which add the plot.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Plot title.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="process_main.removeColdLines">
+<code class="descclassname">process_main.</code><code class="descname">removeColdLines</code><span class="sig-paren">(</span><em>data</em>, <em>returnMode=0</em>, <em>timeit=False</em>, <em>verbose=False</em>, <em>plot=False</em>, <em>saveName=None</em>, <em>saveDir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#process_main.removeColdLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes cold points by deleting all data before the first peak in the
+pyrometer data frequency distribution (around 800mV).</p>
+<p>This is done by deleting any data bellow the peak + its width at half height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.array</em>) – Raw pyrometer data with shape (<cite>n</cite>, 3).</p></li>
+<li><p><strong>returnMode</strong> (<em>int</em><em>, </em><em>optional</em>) – Determines what parameters will be returned.</p></li>
+<li><p><strong>timeit</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns the time taken to execute the function.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints to screen additional information.</p></li>
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, produces a plot of the data distribution and cutoff value.</p></li>
+<li><p><strong>saveName</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of file where the image is to be saved.</p></li>
+<li><p><strong>saveDir</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of directory where the image is to be saved.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Return modes:</dt><dd><ul class="simple">
+<li><p>0: returns data above cutoff value (np.array).</p></li>
+<li><p>1: returns cutoff value (float).</p></li>
+<li><p>2: returns both data and cutoff value (np.array, float).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cluster module &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">cluster module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>cluster module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/cluster.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-cluster">
+<span id="cluster-module"></span><h1>cluster module<a class="headerlink" href="#module-cluster" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cluster.Cluster">
+<em class="property">class </em><code class="descclassname">cluster.</code><code class="descname">Cluster</code><span class="sig-paren">(</span><em>shared_cfg</em>, <em>pretrained_cfg</em>, <em>learned_cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Computes optimal process parameters, at each layer, given feedback obtained
+from the machine sensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shared_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>env.n_parts</strong> (<em>int</em>): Total number of parts built under feedback control.</p></li>
+<li><p><strong>env.horizon</strong> (<em>int</em>): Markov Decision Process horizon (here number of layers).</p></li>
+<li><p><strong>env.nS</strong> (<em>int</em>): Dimension of the state vector.</p></li>
+<li><p><strong>comms</strong> (<em>dotmap</em>): Parameters for communication with other classes.</p></li>
+</ul>
+</p></li>
+<li><p><strong>pretrained_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>n_parts</strong> (<em>dotmap</em>): Number of parts built under this control scheme.</p></li>
+<li><p><strong>ctrl_cfg</strong> (<em>dotmap</em>): Configuration parameters passed to the MPC class.</p></li>
+</ul>
+</p></li>
+<li><p><strong>learned_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>n_parts</strong> (<em>dotmap</em>): Number of parts built under this control scheme.</p></li>
+<li><p><strong>ctrl_cfg</strong> (<em>dotmap</em>): Configuration parameters passed to the MPC class.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="cluster.Cluster.computeAction">
+<code class="descname">computeAction</code><span class="sig-paren">(</span><em>states</em><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.computeAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the control actions given the observed system states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>states</strong> (<em>np.array</em>) – Observed states, shape (<cite>n_parts</cite>, <cite>nS</cite>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Computed actions, with shape (<cite>n_parts</cite>, <cite>nU</cite>)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cluster.Cluster.getStates">
+<code class="descname">getStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.getStates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load state vectors uploaded to the server by the <cite>Machine</cite> class.</p>
+<p>This function waits for the <cite>comms.dir/comms.state.rdy_name</cite> folder to be
+created by the <cite>Machine</cite> class, before reading the file where the states
+are located, <cite>comms.dir/comms.state.f_name</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>State vector with shape (<cite>n_parts</cite>, <cite>nS</cite>)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cluster.Cluster.initAction">
+<code class="descname">initAction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.initAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial action vector.</p>
+<p>This function is required because an initial layer must be built before
+any feedback is available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Initial action vector with shape (<cite>n_parts</cite>, <cite>nU</cite>)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cluster.Cluster.log">
+<code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs the state and action trajecotries, as wel as the predicted cost,
+which may be of interest to tune some algorithmic parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cluster.Cluster.loop">
+<code class="descname">loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>While within the time horizon, read the states provided by the <cite>Machine</cite>
+class, and compute and save the corresponding actions.</p>
+<p>Allows the class functionality to be conveniently used as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="n">s_cfg</span><span class="p">,</span> <span class="n">cp_cfg</span><span class="p">,</span> <span class="n">cl_cfg</span><span class="p">)</span>
+<span class="n">cluster</span><span class="o">.</span><span class="n">loop</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cluster.Cluster.sendAction">
+<code class="descname">sendAction</code><span class="sig-paren">(</span><em>actions</em><span class="sig-paren">)</span><a class="headerlink" href="#cluster.Cluster.sendAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the computed actions.</p>
+<p>Signals the <cite>Machine</cite> class that actions are ready to be downloaded by
+locally creating the <cite>comms.dir/comms.action.rdy_name</cite> folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>actions</strong> (<em>np.array</em>) – Action vector with shape (<cite>n_parts</cite>, <cite>nU</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

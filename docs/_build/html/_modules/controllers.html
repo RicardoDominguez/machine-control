@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>controllers package &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="layers package" href="layers.html" />
+    <link rel="prev" title="config_cluster module" href="config_cluster.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing, running and enhancing the software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aconityapi.html">Aconity API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aconity.html">aconity module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="machine.html">machine module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster.html">cluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_windows.html">config_windows module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_dmbrl.html">config_dmbrl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_cluster.html">config_cluster module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">controllers package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-controllers.Controller">controllers.Controller module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-controllers.MPC">controllers.MPC module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-controllers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">layers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.optimizers.html">misc.optimizers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">misc package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AconitySTUDIO_client.html">AconitySTUDIO_client module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AconitySTUDIO_utils.html">AconitySTUDIO_utils module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../code.html">Code documentation</a> &raquo;</li>
+        
+      <li>controllers package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_modules/controllers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="controllers-package">
+<h1>controllers package<a class="headerlink" href="#controllers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-controllers.Controller">
+<span id="controllers-controller-module"></span><h2>controllers.Controller module<a class="headerlink" href="#module-controllers.Controller" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="controllers.Controller.Controller">
+<em class="property">class </em><code class="descclassname">controllers.Controller.</code><code class="descname">Controller</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.Controller.Controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Framework of a controller class</p>
+<dl class="method">
+<dt id="controllers.Controller.Controller.act">
+<code class="descname">act</code><span class="sig-paren">(</span><em>obs</em>, <em>t</em>, <em>get_pred_cost=False</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.Controller.Controller.act" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs an action.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.Controller.Controller.dump_logs">
+<code class="descname">dump_logs</code><span class="sig-paren">(</span><em>primary_logdir</em>, <em>iter_logdir</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.Controller.Controller.dump_logs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps logs into primary log directory and per-train iteration log directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.Controller.Controller.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#controllers.Controller.Controller.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets this controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.Controller.Controller.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>obs_trajs</em>, <em>acs_trajs</em>, <em>rews_trajs</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.Controller.Controller.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains this controller using lists of trajectories.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-controllers.MPC">
+<span id="controllers-mpc-module"></span><h2>controllers.MPC module<a class="headerlink" href="#module-controllers.MPC" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="controllers.MPC.MPC">
+<em class="property">class </em><code class="descclassname">controllers.MPC.</code><code class="descname">MPC</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#controllers.Controller.Controller" title="controllers.Controller.Controller"><code class="xref py py-class docutils literal notranslate"><span class="pre">controllers.Controller.Controller</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dotmap</em>) – <p>Configuration parameters.
+.env (gym.env):</p>
+<blockquote>
+<div><p>Environment for which this controller will be used.</p>
+</div></blockquote>
+<dl>
+<dt>.update_fns (list&lt;func&gt;):</dt><dd><p>A list of functions that will be invoked (possibly with a
+tensorflow session) every time this controller is reset.</p>
+</dd>
+<dt>.ac_ub (np.ndarray): (optional)</dt><dd><p>An array of action upper bounds. Defaults to environment action
+upper bounds.</p>
+</dd>
+<dt>.ac_lb (np.ndarray): (optional)</dt><dd><p>An array of action lower bounds. Defaults to environment action
+lower bounds.</p>
+</dd>
+<dt>.per (int): (optional)</dt><dd><p>Determines how often the action sequence will be optimized.
+Defaults to 1 (reoptimizes at every call to act()).</p>
+</dd>
+<dt>.prop_cfg</dt><dd><dl>
+<dt>.model_init_cfg (DotMap):</dt><dd><p>A DotMap of initialization parameters for the model.
+.model_constructor (func):</p>
+<blockquote>
+<div><p>A function which constructs an instance of this model, given model_init_cfg.</p>
+</div></blockquote>
+</dd>
+<dt>.model_train_cfg (dict): (optional)</dt><dd><p>A DotMap of training parameters that will be passed into the
+model every time is is trained. Defaults to an empty dict.</p>
+</dd>
+<dt>.model_pretrained (bool): (optional)</dt><dd><p>If True, assumes that the model has been trained upon construction.</p>
+</dd>
+<dt>.mode (str):</dt><dd><p>Propagation method. Choose between [E, DS, TSinf, TS1, MM].
+See <a class="reference external" href="https://arxiv.org/abs/1805.12114">https://arxiv.org/abs/1805.12114</a> for details.</p>
+</dd>
+<dt>.npart (int):</dt><dd><p>Number of particles used for DS, TSinf, TS1, and MM propagation methods.</p>
+</dd>
+<dt>.ign_var (bool): (optional)</dt><dd><p>Determines whether or not variance output of the model will be ignored.
+Defaults to False unless deterministic propagation is being used.</p>
+</dd>
+<dt>.obs_preproc (func): (optional)</dt><dd><p>A function which modifies observations (in a 2D matrix) before
+they are passed into the model. Defaults to lambda obs: obs.
+Note: Must be able to process both NumPy and Tensorflow arrays.</p>
+</dd>
+<dt>.obs_postproc (func): (optional)</dt><dd><p>A function which returns vectors calculated from the previous
+observations and model predictions, which will then be passed
+into the provided cost function on observations. Defaults to
+lambda obs, model_out: model_out. Note: Must be able to process
+both NumPy and Tensorflow arrays.</p>
+</dd>
+<dt>.obs_postproc2 (func): (optional)</dt><dd><p>A function which takes the vectors returned by obs_postproc and (possibly)
+modifies it into the predicted observations for the next time step.
+Defaults to lambda obs: obs. Note: Must be able to process both NumPy and Tensorflow arrays.</p>
+</dd>
+<dt>.targ_proc (func): (optional)</dt><dd><p>A function which takes current observations and next observations
+and returns the array of targets (so that the model learns the mapping
+obs -&gt; targ_proc(obs, next_obs)). Defaults to lambda obs, next_obs: next_obs.
+Note: Only needs to process NumPy arrays.</p>
+</dd>
+</dl>
+</dd>
+<dt>.opt_cfg</dt><dd><dl class="simple">
+<dt>.mode (str):</dt><dd><p>Internal optimizer that will be used. Choose between [CEM, Random].</p>
+</dd>
+<dt>.cfg (DotMap):</dt><dd><p>A map of optimizer initializer parameters.</p>
+</dd>
+<dt>.plan_hor (int):</dt><dd><p>The planning horizon that will be used in optimization.</p>
+</dd>
+<dt>.obs_cost_fn (func):</dt><dd><p>A function which computes the cost of every observation in a 2D matrix.
+Note: Must be able to process both NumPy and Tensorflow arrays.</p>
+</dd>
+<dt>.ac_cost_fn (func):</dt><dd><p>A function which computes the cost of every action in a 2D matrix.</p>
+</dd>
+<dt>.constrains (np.array):</dt><dd><p>An array with the optimisation constrains = [[lb, ub], [lc1, uc1], [lc2, uc2]]
+so that if u = [v, q], lb &lt;= u &lt;= ub, lc1 &lt;= q/v &lt;= uc2, lc2 &lt;= q/sqrt(v) &lt;= uc2.
+Overwrites ac_lb and ac_ub is constrains[0] is not None.</p>
+</dd>
+</dl>
+</dd>
+<dt>.log_cfg</dt><dd><dl class="simple">
+<dt>.save_all_models (bool): (optional)</dt><dd><p>If True, saves models at every iteration.
+Defaults to False (only most recent model is saved).
+Warning: Can be very memory-intensive.</p>
+</dd>
+<dt>.log_traj_preds (bool): (optional)</dt><dd><p>If True, saves the mean and variance of predicted particle trajectories.
+Defaults to False.</p>
+</dd>
+<dt>.log_particles (bool) (optional)</dt><dd><p>If True, saves all predicted particles trajectories.
+Defaults to False. Note: Takes precedence over log_traj_preds.
+Warning: Can be very memory-intensive</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="controllers.MPC.MPC.act">
+<code class="descname">act</code><span class="sig-paren">(</span><em>obs</em>, <em>t</em>, <em>get_pred_cost=False</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.act" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the action that this controller would take at time t given observation obs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – The current observation</p></li>
+<li><p><strong>t</strong> – The current timestep</p></li>
+<li><p><strong>get_pred_cost</strong> – If True, returns the predicted cost for the action sequence found by
+the internal optimizer.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: An action (and possibly the predicted cost)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.MPC.MPC.changePlanHor">
+<code class="descname">changePlanHor</code><span class="sig-paren">(</span><em>T</em>, <em>freq=None</em>, <em>change_over=False</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.changePlanHor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically changes the planning horizon of the MPC algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>T</strong> (<em>int</em>) – New planning horizon.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.MPC.MPC.changeTargetCost">
+<code class="descname">changeTargetCost</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.changeTargetCost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="controllers.MPC.MPC.dump_logs">
+<code class="descname">dump_logs</code><span class="sig-paren">(</span><em>primary_logdir</em>, <em>iter_logdir</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.dump_logs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves logs to either a primary log directory or another iteration-specific directory.
+See __init__ documentation to see what is being logged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_logdir</strong> (<em>str</em>) – A directory path. This controller assumes that this directory
+does not change every iteration.</p></li>
+<li><p><strong>iter_logdir</strong> (<em>str</em>) – A directory path. This controller assumes that this directory
+changes every time dump_logs is called.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: None</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="controllers.MPC.MPC.optimizers">
+<code class="descname">optimizers</code><em class="property"> = {'CEM': &lt;class 'dmbrl.misc.optimizers.cem.CEMOptimizer'&gt;, 'Random': &lt;class 'dmbrl.misc.optimizers.random.RandomOptimizer'&gt;}</em><a class="headerlink" href="#controllers.MPC.MPC.optimizers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="controllers.MPC.MPC.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets this controller (clears previous solution, calls all update functions).</p>
+<p>Returns: None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.MPC.MPC.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>obs_trajs</em>, <em>obs_prime_trajs</em>, <em>acs_trajs</em><span class="sig-paren">)</span><a class="headerlink" href="#controllers.MPC.MPC.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the internal model of this controller. Once trained,
+this controller switches from applying random actions to using MPC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs_trajs</strong> – (N, nS)</p></li>
+<li><p><strong>obs_prime_trajs</strong> – (N, nS) observations at next time step</p></li>
+<li><p><strong>acs_trajs</strong> – (N, nU)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: None.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-controllers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-controllers" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="layers.html" class="btn btn-neutral float-right" title="layers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="config_cluster.html" class="btn btn-neutral float-left" title="config_cluster module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

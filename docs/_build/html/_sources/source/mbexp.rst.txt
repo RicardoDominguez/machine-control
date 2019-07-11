@@ -1,0 +1,7 @@
+mbexp module
+============
+
+.. automodule:: mbexp
+    :members:
+    :undoc-members:
+    :show-inheritance:

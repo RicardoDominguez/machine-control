@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>machine module &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>machine module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_modules/machine.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-machine">
+<span id="machine-module"></span><h1>machine module<a class="headerlink" href="#module-machine" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="machine.Machine">
+<em class="property">class </em><code class="descclassname">machine.</code><code class="descname">Machine</code><span class="sig-paren">(</span><em>shared_cfg</em>, <em>machine_cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Reads the raw sensory data outputted by the aconity machine, processes it
+into a low-dimensional state vector and uploads it a remote server for
+parameter optimisation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shared_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>n_ignore</strong> (<em>int</em>): Number of additional parts to be built on top of <cite>env.n_parts</cite> (pyrometer may not record data for the first few parts).</p></li>
+<li><p><strong>env.nS</strong> (<em>int</em>): Dimensionality of the state vector.</p></li>
+<li><p><strong>comms</strong> (<em>dotmap</em>): Configuration parameters for server communication.</p></li>
+</ul>
+</p></li>
+<li><p><strong>machine_cfg</strong> (<em>dotmap</em>) – <ul>
+<li><p><strong>aconity.layers</strong> (<em>array of int</em>): Layer range to be built, as [layer_min, layer_max].</p></li>
+<li><p><strong>aconity.open_loop</strong> (<em>np.array</em>): Parameters used to build the parts built using fixed parameters, np.array with shape (<cite>n_fixed_parts</cite>, 2).</p></li>
+<li><p><strong>aconity.n_parts</strong> (<em>int</em>): Number of parts to be built, excluding ignored parts.</p></li>
+<li><p><strong>process.sess_dir</strong> (<em>str</em>): Folder where pyrometer data is stored by the Aconity machine.</p></li>
+<li><p><strong>process.sleep_t</strong> (<em>float</em>): Time between a sensor data file being first detected and attempting to read it. Prevents errors emerging from opening the file while it is still being written.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="machine.Machine.getActions">
+<code class="descname">getActions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.getActions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download locally the action file outputted by the remote server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.getFileName">
+<code class="descname">getFileName</code><span class="sig-paren">(</span><em>layer</em>, <em>piece</em><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.getFileName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pyrometer data file path for a given layer and part number.</p>
+<p>This function accounts for the parts being ignored. The layer thickness
+is 0.03 mm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layer</strong> (<em>int</em>) – Layer number.</p></li>
+<li><p><strong>piece</strong> (<em>int</em>) – Part number.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.getStates">
+<code class="descname">getStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.getStates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the raw data outputted from the pyrometer and processes it into
+low-dimensional state vectors.</p>
+<p>For every part that must be observed, the raw data is red from the file
+outputted by the Aconity machine, cold lines are removed, the data pertaining
+to the object manufactured is kept, and it is discretised into a number
+of discrete regions in which the mean sensor value is computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>State vectors with shape (<cite>n_parts</cite>,  <cite>nS</cite>)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.initProcessing">
+<code class="descname">initProcessing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.initProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtains the folder in which data will be written by the pyrometer sensor.</p>
+<p>This function automatically detects the latest session and job folders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>states</em><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.loop">
+<code class="descname">loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iteratively obtain next layer’s parameters from the remote server,
+read and process raw pyrometer data, and upload the low-dimensional
+states to the remote server to compute the next set of optimal parameters.</p>
+<p>Allows the class functionality to be conveniently used as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">machine</span> <span class="o">=</span> <span class="n">Machine</span><span class="p">(</span><span class="n">s_cfg</span><span class="p">,</span> <span class="n">m_cfg</span><span class="p">)</span>
+<span class="n">machine</span><span class="o">.</span><span class="n">loop</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.pieceNumber">
+<code class="descname">pieceNumber</code><span class="sig-paren">(</span><em>piece_indx</em>, <em>buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.pieceNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the index given by AconityStudio to each individual part.</p>
+<p>For instance, if the first part should be ignored, and part numbers increase
+three by three, then <cite>return int((piece_indx+1)*3+1)</cite> should be used, thus
+0 -&gt; 4, 1 -&gt; 7, 2 -&gt; 10, etc.</p>
+<p>On the other hand, if the first three parts should be ignored, and part numbers
+increase one by one, then <cite>return int((piece_indx+3)+1)</cite> should be used, thus
+0 -&gt; 4, 1 -&gt; 5, 2 -&gt; 6, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>piece_indx</strong> (<em>int</em>) – Input index, starting from 0.</p></li>
+<li><p><strong>n_ignore</strong> (<em>int</em>) – Number of initial parts that should be ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output index as used by AconityStudio.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="machine.Machine.sendStates">
+<code class="descname">sendStates</code><span class="sig-paren">(</span><em>states</em><span class="sig-paren">)</span><a class="headerlink" href="#machine.Machine.sendStates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads to the the remote server the input state vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>states</strong> (<em>np.array</em>) – Processed state vector.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

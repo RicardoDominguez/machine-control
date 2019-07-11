@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installing, running and enhancing the software &mdash; Aconity Control 0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration parameters" href="config.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Aconity Control
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing, running and enhancing the software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-required-dependencies">Installing required dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-software">Running the software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enhancing-the-software">Enhancing the software</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-another-sensor">Adding another sensor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dividing-a-part-into-multiple-subparts">Dividing a part into multiple “subparts”</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aconityapi.html">Aconity API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Aconity Control</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installing, running and enhancing the software</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installing-running-and-enhancing-the-software">
+<h1>Installing, running and enhancing the software<a class="headerlink" href="#installing-running-and-enhancing-the-software" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-required-dependencies">
+<h2>Installing required dependencies<a class="headerlink" href="#installing-required-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to install all required software packages is using <cite>conda</cite>.</p>
+<p>The modeling and optimisation software requires TensorFlow. This package can
+be run on CPU or GPU (if one is available), the latter offering up to 100x faster
+run time performance.</p>
+<p>For a CPU installation use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">tf</span><span class="o">-</span><span class="n">cpu</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.5</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">tf</span><span class="o">-</span><span class="n">cpu</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">tensorflow</span><span class="o">==</span><span class="mf">1.10</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">dotmap</span> <span class="n">scipy</span> <span class="n">gpflow</span> <span class="n">gym</span><span class="o">==</span><span class="mf">0.9</span><span class="o">.</span><span class="mi">4</span> <span class="n">pytest</span> <span class="n">tqdm</span> <span class="n">sklearn</span> <span class="n">scikit</span><span class="o">-</span><span class="n">optimize</span>
+</pre></div>
+</div>
+<p>For a GPU installation use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">tf</span><span class="o">-</span><span class="n">gpu</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.5</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">tf</span><span class="o">-</span><span class="n">gpu</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">tensorflow</span><span class="o">-</span><span class="n">gpu</span><span class="o">==</span><span class="mf">1.10</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">dotmap</span> <span class="n">scipy</span> <span class="n">gpflow</span> <span class="n">gym</span><span class="o">==</span><span class="mf">0.9</span><span class="o">.</span><span class="mi">4</span> <span class="n">pytest</span> <span class="n">tqdm</span> <span class="n">sklearn</span> <span class="n">scikit</span><span class="o">-</span><span class="n">optimize</span>
+</pre></div>
+</div>
+<p>If there are dependencies missing, these can be installed using <cite>pip</cite> or <cite>conda</cite>
+in the typical Python fashion.</p>
+</div>
+<div class="section" id="running-the-software">
+<h2>Running the software<a class="headerlink" href="#running-the-software" title="Permalink to this headline">¶</a></h2>
+<p>First, one must set the desired configuration for the build. The configuration files are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>config_cluster.py</p></li>
+<li><p>config_windows.py</p></li>
+<li><p>config_dmbrl.py</p></li>
+</ul>
+</div></blockquote>
+<p>Details regarding the available configurations can be found under the <cite>Configuration</cite> section.</p>
+<p>After setting the desired configuration, one must:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Run <cite>aconity.py</cite> in the AconityComputer (i.e. using the Python IDLE), and wait until the command line displays <cite>“Waiting for actions…”</cite></p></li>
+<li><p>Open MobaXterm</p>
+<ul>
+<li><p>Log into <cite>USERNAME&#64;scentrohpc.shef.ac.uk</cite> and provide the pertinent password.</p></li>
+<li><p>Run <cite>source activate tf-cpu</cite> (or whichever conda environment has the required dependencies)</p></li>
+<li><p>Run <cite>cd software-path</cite> where <cite>software-path</cite> is the location of the software package on the remote server</p></li>
+<li><p>Run <cite>python cluster.py</cite></p></li>
+<li><p>Wait until the command line displays “Waiting for states…”</p></li>
+</ul>
+</li>
+<li><p>Run <cite>machine.py</cite> (i.e. using the Python IDLE)</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="enhancing-the-software">
+<h2>Enhancing the software<a class="headerlink" href="#enhancing-the-software" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>To implement a different control strategy, modify the function <cite>computeAction()</cite> in <cite>cluster.py</cite>.</p></li>
+<li><p>To make changes to the current control strategy, modify the relevant files within <cite>dmbrl/</cite></p></li>
+<li><p>To change how the pyrometer measurements are converted into the low-dimensional features used for modeling and control, change the function <cite>getStates()</cite> from <cite>machine.py</cite>.</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="adding-another-sensor">
+<h3>Adding another sensor<a class="headerlink" href="#adding-another-sensor" title="Permalink to this headline">¶</a></h3>
+<p>To add another sensor one could change the function <cite>getStates()</cite> from <cite>machine.py</cite> to resemble:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_parts</span><span class="p">,</span> <span class="n">M</span><span class="o">+</span><span class="n">N</span><span class="p">))</span> <span class="c1"># Initialise state vector</span>
+<span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_parts</span><span class="p">):</span> <span class="c1"># Read information for all parts being monitored</span>
+  <span class="c1"># Load raw data from sensors</span>
+  <span class="n">data_sensor1</span> <span class="o">=</span> <span class="n">loadSensor1</span><span class="p">(</span><span class="n">file_path_to_part_sensor1</span><span class="p">)</span>
+  <span class="n">data_sensor2</span> <span class="o">=</span> <span class="n">loadSensor2</span><span class="p">(</span><span class="n">file_path_to_part_sensor2</span><span class="p">)</span>
+
+  <span class="c1"># Process raw data from sensors</span>
+  <span class="n">state_sensor1</span> <span class="o">=</span> <span class="n">processDataSensor1</span><span class="p">(</span><span class="n">data_sensor1</span><span class="p">)</span> <span class="c1"># vector with shape (N,)</span>
+  <span class="n">state_sensor2</span> <span class="o">=</span> <span class="n">processDataSensor2</span><span class="p">(</span><span class="n">data_sensor2</span><span class="p">)</span> <span class="c1"># vector with shape (M,)</span>
+
+  <span class="c1"># Combine</span>
+  <span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">state_sensor1</span><span class="p">,</span> <span class="n">state_sensor2</span><span class="p">))</span> <span class="c1"># shape (N+M,)</span>
+  <span class="n">states</span><span class="p">[</span><span class="n">part</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+<span class="k">return</span> <span class="n">states</span>
+</pre></div>
+</div>
+<p>One would also need to ensure that the new state representation is suitable for
+modeling the system with sufficient accuracy. To do so, convert the build
+data of interest into the state representation to be tested, train the model
+with the given state representation and check its accuracy in making predictions
+over previously unseen data (R2, RMSE…). Take the following script for reference:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">dotmap</span> <span class="k">import</span> <span class="n">DotMap</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">dmbrl.modeling.models</span> <span class="k">import</span> <span class="n">BNN</span>
+<span class="kn">from</span> <span class="nn">dmbrl.modeling.layers</span> <span class="k">import</span> <span class="n">FC</span>
+
+<span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">states_file</span><span class="p">)</span> <span class="c1"># Dimension (n_samples, n_states)</span>
+<span class="n">actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">actions_file</span><span class="p">)</span> <span class="c1"># Dimension (n_samples-1, n_actions)</span>
+<span class="n">XU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">U</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># inputs to the model</span>
+<span class="n">Yd</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># training targets</span>
+
+<span class="c1"># Split data into train and test sets</span>
+<span class="n">test_ratio</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">num_test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">test_ratio</span><span class="p">)</span>
+<span class="n">permutation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">train_x</span><span class="p">,</span> <span class="n">test_x</span> <span class="o">=</span> <span class="n">XU</span><span class="p">[</span><span class="n">permutation</span><span class="p">[</span><span class="n">num_test</span><span class="p">:]],</span> <span class="n">XU</span><span class="p">[</span><span class="n">permutation</span><span class="p">[:</span><span class="n">num_test</span><span class="p">]]</span>
+<span class="n">train_y</span><span class="p">,</span> <span class="n">test_y</span> <span class="o">=</span> <span class="n">Yd</span><span class="p">[</span><span class="n">permutation</span><span class="p">[</span><span class="n">num_test</span><span class="p">:]],</span> <span class="n">Yd</span><span class="p">[</span><span class="n">permutation</span><span class="p">[:</span><span class="n">num_test</span><span class="p">]]</span>
+
+<span class="c1"># Before this, define the model parameters model_in, model_out, n_layers, n_neurons, l_rate, wd_in, wd_hid, wd_out, num_networks</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">DotMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;model1&quot;</span><span class="p">,</span> <span class="n">num_networks</span><span class="o">=</span><span class="n">num_networks</span><span class="p">,</span> <span class="n">sess</span><span class="o">=</span><span class="n">sess</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">BNN</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">FC</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">input_dim</span><span class="o">=</span><span class="n">model_in</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;swish&quot;</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">wd_in</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">FC</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;swish&quot;</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">wd_hid</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">FC</span><span class="p">(</span><span class="n">model_out</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">wd_out</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="n">l_rate</span><span class="p">})</span>
+
+<span class="c1"># Train and make the predictions</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">training_epochs</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">predicted_y</span><span class="p">,</span> <span class="n">var_y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span> <span class="c1"># Essentially the mean and variance of the prediction, as it is a probabilistic model</span>
+
+<span class="c1"># Compute metrics (R2 and RMSE should be previously define functions)</span>
+<span class="n">r2_metric</span> <span class="o">=</span> <span class="n">R2</span><span class="p">(</span><span class="n">test_y</span><span class="p">,</span> <span class="n">predicted_y</span><span class="p">)</span>
+<span class="n">rmse_metric</span> <span class="o">=</span> <span class="n">RMSE</span><span class="p">(</span><span class="n">test_y</span><span class="p">,</span> <span class="n">predicted_y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When incorporating a new sensor, you most likely want to change how the scaling
+of the data is done, so that the magnitude of all your state elements is similar.
+Otherwise model performance will be degraded. To change the scaler functionality, make changes
+to <cite>dmbrl/modeling/utils/ModelScaler.py</cite> as needed.</p>
+</div>
+<div class="section" id="dividing-a-part-into-multiple-subparts">
+<h3>Dividing a part into multiple “subparts”<a class="headerlink" href="#dividing-a-part-into-multiple-subparts" title="Permalink to this headline">¶</a></h3>
+<p>This approach aims to improve <cite>intra</cite>-layer temperature homogeneity. There are
+two sides to this problem. First, one probably wants to model the entire part as
+one. To do so, one should combine the sensory information obtained for all subparts
+into a single state vector, in a similar manner to explanation above (but instead
+of combining sensors, combining parts).</p>
+<p>Secondly, you must configure the MPC class to output more parameters. For instance, if you have
+7 sub-parts and want to select distinct laser power and scan configurations in each
+of them, then your action vector should have dimension 7 * 2 = 14. To change the dimension of the
+vector, simply ensure all <cite>ac_lb</cite>, <cite>ac_up</cite> and <cite>constrains</cite> variables fed to the <cite>MPC</cite> class
+have the correct dimension, i.e check that ac_lb.shape==14, ac_up.shape==14 and same with <cite>constrains</cite>.</p>
+<p>Then, you must make changes to the function <cite>performLayer()</cite> within <cite>aconity.py</cite> so that
+the correct parts are addressed when changing the laser power and scan speed (must be able to handle
+action inputs with secondary dimension &gt; 2).</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The University of Sheffield
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
